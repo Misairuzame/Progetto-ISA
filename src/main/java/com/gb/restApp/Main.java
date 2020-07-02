@@ -55,43 +55,15 @@ public class Main {
             get("/:id", Main::dispatchMusicId);
         });
 
-        get("/upmusic", Main::upMusicForm);
+        get("/album",  Main::dispatchAlbum);
 
-        get("/insmusic", Main::insMusicForm);
+        get("/artist",  Main::dispatchArtist);
 
-        get("/delmusic", Main::delMusicForm);
+        get("/group",  Main::dispatchGroup);
 
-        path("/album", () -> {
-            get("",  Main::dispatchAlbum);
-        });
+        get("/genre",  Main::dispatchGenre);
 
-        get("/insalbum", Main::insAlbumForm);
-
-        get("/delalbum", Main::delAlbumForm);
-
-        path("/artist", () -> {
-            get("",  Main::dispatchArtist);
-        });
-
-        get("/upartist", Main::upArtistForm);
-
-        get("/insartist", Main::insArtistForm);
-
-        path("/group", () -> {
-            get("",  Main::dispatchGroup);
-        });
-
-        get("/insgroup", Main::insGroupForm);
-
-        path("/genre", () -> {
-            get("",  Main::dispatchGenre);
-        });
-
-        get("/insgenre", Main::insGenreForm);
-
-        path("/link", () -> {
-            get("",  Main::getLinks);
-        });
+        get("/link",  Main::getLinks);
 
         get("/mjoinl", Main::musicJoinLink);
 
@@ -99,11 +71,13 @@ public class Main {
 
         get("/joinall", Main::joinAll);
 
+        get("/search", Main::searchMusic);
+
         get("/favicon.ico", Main::favicon);
 
-        notFound(Main::handleNotFound);
+        get("/:form", Main::dispatchForms);
 
-        options("/*", Main::allowCORS);
+        notFound(Main::handleNotFound);
 
     }
 
@@ -111,47 +85,23 @@ public class Main {
      * Sezione di utility varie
      */
 
-    private static String allowCORS(Request req, Response res) {
-        /**
-         * Cross-Origin Resource Sharing
-         */
-        String accessControlRequestHeaders = req.headers("Access-Control-Request-Headers");
-        if (accessControlRequestHeaders != null) {
-            res.header("Access-Control-Allow-Headers", accessControlRequestHeaders);
-        }
-
-        String accessControlRequestMethod = req.headers("Access-Control-Request-Method");
-        if (accessControlRequestMethod != null) {
-            res.header("Access-Control-Allow-Methods", accessControlRequestMethod);
-        }
-        return "OK";
-    }
-
     private static void applyFilters(Request req, Response res) {
         /**
-         * Permette il CORS (Cross Origin Resource Sharing).
-         * Se non è permesso, il server blocca le richieste
-         * del client Angular, che gira sulla porta 4200.
-         */
-        res.header("Access-Control-Allow-Origin" , "*");
-        res.header("Access-Control-Allow-Headers", "*");
-
-        /**
-         * Toglie lo slash finale, se presente.
+         * Toglie lo slash finale, se presente. Facilita il matching.
          * Il redirect funziona solamente con richieste GET,
          * motivo per cui viene fatto il "doppio matching"
          * nel metodo main.
          */
         String path = req.pathInfo();
-        if (req.requestMethod().equals("GET") && path.endsWith("/") && !path.equals("/")) {
+        if (req.requestMethod().equals(GET) && path.endsWith("/") && !path.equals("/")) {
             res.redirect(path.substring(0, path.length() - 1));
         }
 
         /**
          * Mette il content-type della Response a "text/html"
+         * e l'encoding a UTF-8.
          */
         res.raw().setContentType(TEXT_HTML);
-
         res.raw().setCharacterEncoding("UTF-8");
 
         /**
@@ -203,7 +153,7 @@ public class Main {
 
     private static String getHomepage(Request req, Response res) {
         res.status(SC_OK);
-        String message = "Benvenuto nella ReST API MusicService.";
+        String message = "Benvenuto su MusicService!";
         info(message);
         Map<String, String> model = new HashMap<>();
         model.put("welcometext", message);
@@ -215,7 +165,6 @@ public class Main {
      * Sezione per effettuare il dispatching delle richieste.
      * Necessario per gestire i metodi HTTP.
      */
-
 
     private static String dispatchMusic(Request req, Response res) {
         String userMethod = req.queryParamOrDefault("method", "GET");
@@ -276,9 +225,22 @@ public class Main {
 
 
     /**
-     * Sezione per l'esecuzione di query
+     * Sezione per la visualizzazione dei form
      */
 
+    private static String dispatchForms(Request req, Response res) {
+        Map<String, String> emptyModel = new HashMap<>();
+        String viewName = req.params("form");
+        File testFile = new File(USER_DIR + "\\src\\main\\resources\\templates\\" + viewName + ".html");
+        if (testFile.exists()) {
+            return engine.render(new ModelAndView(emptyModel, viewName));
+        } else return handleNotFound(req, res);
+    }
+
+
+    /**
+     * Sezione per l'esecuzione di query
+     */
 
     private static String getMusic(Request req, Response res) {
         int pageNum = 0;
@@ -344,21 +306,6 @@ public class Main {
         model.put("musicList", musicList);
         model.put("page", -100);
         return engine.render(new ModelAndView(model, "musicList"));
-    }
-
-    private static String upMusicForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "upMusic"));
-    }
-
-    private static String insMusicForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "insMusic"));
-    }
-
-    private static String delMusicForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "delMusic"));
     }
 
     private static String insertMusic(Request req, Response res) {
@@ -467,6 +414,46 @@ public class Main {
 
     }
 
+    private static String searchMusic(Request req, Response res) {
+        int pageNum = 0;
+
+        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        if(req.queryParams("page") != null) {
+            if(!isNumber(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        if(req.queryParams("string") == null || req.queryParams("string").equals("")) {
+            return returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                    "Specificare la stringa di ricerca in maniera corretta.");
+        }
+
+        List<MusicStrings> musicList = db.searchMusic(req.queryParams("string"), pageNum);
+        if (musicList == null) {
+            return handleInternalError(req, res);
+        }
+        if (musicList.isEmpty()) {
+            return handleNotFound(req, res);
+        }
+
+        res.status(SC_OK);
+
+        info(musicList.toString());
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("musicList", musicList);
+        model.put("page", pageNum);
+        model.put("string", req.queryParams("string"));
+        return engine.render(new ModelAndView(model, "search"));
+    }
+
     private static String getAlbums(Request req, Response res) {
         PostgreSQLImpl db = PostgreSQLImpl.getInstance();
         if (db == null) {
@@ -488,16 +475,6 @@ public class Main {
         Map<String, Object> model = new HashMap<>();
         model.put("albumList", albumList);
         return engine.render(new ModelAndView(model, "albumList"));
-    }
-
-    private static String insAlbumForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "insAlbum"));
-    }
-
-    private static String delAlbumForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "delAlbum"));
     }
 
     private static String insertAlbum(Request req, Response res) {
@@ -582,16 +559,6 @@ public class Main {
         Map<String, Object> model = new HashMap<>();
         model.put("artistList", artistList);
         return engine.render(new ModelAndView(model, "artistList"));
-    }
-
-    private static String upArtistForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "upArtist"));
-    }
-
-    private static String insArtistForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "insArtist"));
     }
 
     private static String updateArtist(Request req, Response res) {
@@ -680,11 +647,6 @@ public class Main {
         return engine.render(new ModelAndView(model, "groupList"));
     }
 
-    private static String insGroupForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "insGroup"));
-    }
-
     private static String insertGroup(Request req, Response res) {
         PostgreSQLImpl db = PostgreSQLImpl.getInstance();
         if (db == null) {
@@ -736,11 +698,6 @@ public class Main {
         Map<String, Object> model = new HashMap<>();
         model.put("genreList", genreList);
         return engine.render(new ModelAndView(model, "genreList"));
-    }
-
-    private static String insGenreForm(Request req, Response res) {
-        Map<String, String> model = new HashMap<>();
-        return engine.render(new ModelAndView(model, "insGenre"));
     }
 
     private static String insertGenre(Request req, Response res) {

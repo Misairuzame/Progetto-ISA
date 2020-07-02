@@ -1,5 +1,7 @@
-# Progetto per l'esame di Tecnologie per le Basi di Dati
+# Progetto per l'esame di Ingegneria del Software Avanzata
 ![](images/logo.png)
+
+# !WORK IN PROGRESS!
 
 ## Introduzione
 Questo progetto vuole essere una prima versione di un sito che gestisce un database di musica. \

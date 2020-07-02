@@ -2,38 +2,130 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" type="text/css"
-          href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <!-- CSS "globale" -->
     <style>
+        nav li>a {
+            font-variant-caps: small-caps;
+            font-weight: bold;
+            font-size: x-large;
+        }
+
         .btn {
-            margin: 5px;
+            margin: 3px;
         }
     </style>
     <title>MusicService</title>
 </head>
 <body th:style="'background-image: url('+@{http://localhost:8080/img/background.webp}+'); background-size: cover; background-repeat: no-repeat; background-attachment: fixed'">
 <header>
-    <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark" style="width: 100%; height: fit-content;">
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
         <a class="navbar-brand" href="/"><h1 class="text-warning">MusicService</h1></a>
-        <form class="form-inline">
-            <a href="/music" class="btn btn-outline-primary">Lista Music</a>
-            <a href="/album" class="btn btn-outline-primary">Lista Album</a>
-            <a href="/artist" class="btn btn-outline-primary">Lista Artist</a>
-            <a href="/group" class="btn btn-outline-primary">Lista Group</a>
-            <a href="/genre" class="btn btn-outline-primary">Lista Genre</a>
-            <a href="/link" class="btn btn-outline-primary">Lista Link</a>
-            <a href="/delmusic" class="btn btn-outline-danger">Elimina Music</a>
-            <a href="/delalbum" class="btn btn-outline-danger">Elimina Album</a>
-            <a href="/insmusic" class="btn btn-outline-success">Inserisci Music</a>
-            <a href="/insgroup" class="btn btn-outline-success">Inserisci Group</a>
-            <a href="/insalbum" class="btn btn-outline-success">Inserisci Album</a>
-            <a href="/insartist" class="btn btn-outline-success">Inserisci Artist</a>
-            <a href="/insgenre" class="btn btn-outline-success">Inserisci Genre</a>
-            <a href="/mjoinl" class="btn btn-outline-warning">Music &#10781; Link</a>
-            <a href="/arjoing" class="btn btn-outline-warning">Artist &#10781; Group</a>
-            <a href="/upmusic" class="btn btn-outline-light">Update Music</a>
-            <a href="/upartist" class="btn btn-outline-light">Update Artist</a>
-            <a href="/joinall" class="btn btn-outline-info">Join All</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-primary" href="#" id="dropdownMusic" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Music
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMusic">
+                        <a class="dropdown-item" href="/music">Lista Musiche</a>
+                        <a class="dropdown-item" href="/insmusic">Inserisci Musica</a>
+                        <a class="dropdown-item" href="/upmusic">Aggiorna Musica</a>
+                        <a class="dropdown-item" href="/delmusic">Elimina Musica</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-success" href="#" id="dropdownAlbum" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Album
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownAlbum">
+                        <a class="dropdown-item" href="/album">Lista Album</a>
+                        <a class="dropdown-item" href="/insalbum">Inserisci Album</a>
+                        <a class="dropdown-item" href="/delalbum">Elimina Album</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-danger" href="#" id="dropdownArtist" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Artist
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownArtist">
+                        <a class="dropdown-item" href="/artist">Lista Artisti</a>
+                        <a class="dropdown-item" href="/insartist">Inserisci Artista</a>
+                        <a class="dropdown-item" href="/upartist">Aggiorna Artista</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-warning" href="#" id="dropdownGroup" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Group
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownGroup">
+                        <a class="dropdown-item" href="/group">Lista Gruppi</a>
+                        <a class="dropdown-item" href="/insgroup">Inserisci Gruppo</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-info" href="#" id="dropdownGenre" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Genre
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownGenre">
+                        <a class="dropdown-item" href="/genre">Lista Generi</a>
+                        <a class="dropdown-item" href="/insgenre">Inserisci Genere</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-light" href="#" id="dropdownLink" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Link
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownLink">
+                        <a class="dropdown-item" href="/link">Lista Link</a>
+                    </div>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="dropdownJoin" data-toggle="dropdown"
+                       aria-haspopup="true" aria-expanded="false">
+                        Join
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="dropdownJoin">
+                        <a class="dropdown-item" href="/mjoinl">Music &#10781; Link</a>
+                        <a class="dropdown-item" href="/arjoing">Artist &#10781; Group</a>
+                        <a class="dropdown-item" href="/joinall">Join di tutto</a>
+                    </div>
+                </li>
+
+            </ul>
+        </div>
+        <!-- SEZIONE PER LA RICERCA -->
+        <form class="form-inline my-2 my-lg-0" action="search" method="get">
+            <input class="form-control mr-sm-2" type="search" placeholder="Cerca..." aria-label="Cerca..." name="string">
+            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+                <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd"
+                          d="M10.442 10.442a1 1 0 0 1 1.415 0l3.85 3.85a1 1 0 0 1-1.414 1.415l-3.85-3.85a1 1 0 0 1 0-1.415z"/>
+                    <path fill-rule="evenodd"
+                          d="M6.5 12a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11zM13 6.5a6.5 6.5 0 1 1-13 0 6.5 6.5 0 0 1 13 0z"/>
+                </svg>
+            </button>
         </form>
     </nav>
 </header>

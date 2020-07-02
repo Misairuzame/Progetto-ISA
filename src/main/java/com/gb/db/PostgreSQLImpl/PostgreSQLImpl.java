@@ -282,6 +282,43 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
+    public List<MusicStrings> searchMusic(String searchTerm, int page) {
+        List<MusicStrings> musicList = new ArrayList<>();
+        searchTerm = searchTerm.replaceAll("([\\\\+*?\\[\\](){}|.^$])", "\\\\$1");
+
+        String sql =
+                " SELECT * " +
+                " FROM ( " +
+                    " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
+                    " FROM " + MUSIC_TABLE + " AS M, " + GROUP_TABLE + " AS GR, " + GENRE_TABLE + " AS GE, " + ALBUM_TABLE + " AS AL " +
+                    " WHERE M.authorid = GR.groupid AND M.genreid = GE.genreid AND M.albumid = AL.albumid " +
+                    " ) AS temp" +
+                " WHERE temp.musictitle ~* ? " +
+                " OR temp.groupname ~* ? " +
+                " OR temp.albumtitle ~* ? " +
+                " OR temp.genrename ~* ? " +
+                " LIMIT ? OFFSET ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, searchTerm);
+            ps.setString(2, searchTerm);
+            ps.setString(3, searchTerm);
+            ps.setString(4, searchTerm);
+            ps.setInt(5, PAGE_SIZE);
+            ps.setInt(6, page*PAGE_SIZE);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    musicList.add(new MusicStrings(rs));
+                }
+            }
+            return musicList;
+        } catch (SQLException e) {
+            logger.error("Error in searchMusic: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
     public List<Album> getAllAlbums() {
         List<Album> albumList = new ArrayList<>();
 
