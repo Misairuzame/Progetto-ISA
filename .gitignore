@@ -1,0 +1,6 @@
+# Default ignored files
+/.idea/workspace.xml
+.gradle
+build
+creds.txt
+musicDB.db
