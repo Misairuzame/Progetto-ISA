@@ -32,10 +32,10 @@ public class Album {
     }
 
     public Album(Integer albumId, String title, Integer year, Integer groupId) {
-        this.albumId = albumId;
-        this.title = title;
-        this.year = year;
-        this.groupId = groupId;
+        setAlbumId(albumId);
+        setTitle(title);
+        setYear(year);
+        setGroupId(groupId);
     }
 
     public Integer getAlbumId() {
@@ -43,6 +43,9 @@ public class Album {
     }
 
     public void setAlbumId(Integer albumId) {
+        if(albumId < 0) {
+            throw new IllegalArgumentException("AlbumId deve essere > 0.");
+        }
         this.albumId = albumId;
     }
 
@@ -51,6 +54,9 @@ public class Album {
     }
 
     public void setTitle(String title) {
+        if(title.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 30.");
+        }
         this.title = title;
     }
 
@@ -59,6 +65,9 @@ public class Album {
     }
 
     public void setYear(Integer year) {
+        if(year < 0 || year > 3000) {
+            throw new IllegalArgumentException("Anno album deve essere compreso fra 0 e 3000.");
+        }
         this.year = year;
     }
 
@@ -67,6 +76,9 @@ public class Album {
     }
 
     public void setGroupId(Integer groupId) {
+        if(groupId < 0) {
+            throw new IllegalArgumentException("Album.groupid deve essere > 0.");
+        }
         this.groupId = groupId;
     }
 

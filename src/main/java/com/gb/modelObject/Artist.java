@@ -40,6 +40,9 @@ public class Artist {
     }
 
     public void setArtistId(Integer artistId) {
+        if(artistId < 0) {
+            throw new IllegalArgumentException("ArtistId deve essere > 0.");
+        }
         this.artistId = artistId;
     }
 
@@ -48,6 +51,9 @@ public class Artist {
     }
 
     public void setName(String name) {
+        if(name.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome artista deve essere < 30.");
+        }
         this.name = name;
     }
 
@@ -56,6 +62,9 @@ public class Artist {
     }
 
     public void setGroupId(Integer groupId) {
+        if(groupId < 0) {
+            throw new IllegalArgumentException("Artist.groupId deve essere > 0.");
+        }
         this.groupId = groupId;
     }
 

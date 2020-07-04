@@ -8,6 +8,13 @@ import java.sql.SQLException;
 
 import static com.gb.Constants.*;
 
+/**
+ * Questa classe è stata creata per poter mostrare all'utente i risultati
+ * della ricerca a testo libero. Visto che nella tabella musica vengono
+ * memorizzati principalmente degli ID (chiavi esterne), la ricerca a testo
+ * libero viene effettuata su una tabella di join, costruita in modo da
+ * contenere, invece degli ID esterni, i nomi o titoli ad essi associati.
+ */
 public class MusicStrings {
 
     private static final Logger logger = LoggerFactory.getLogger(MusicStrings.class);
@@ -15,15 +22,19 @@ public class MusicStrings {
     private Integer musicId;
     private String title;
     private String author;
+    private String artist;
     private String album;
     private Integer year;
     private String genre;
+
+    public MusicStrings() {}
 
     public MusicStrings(ResultSet rs) {
         try {
             setMusicId(rs.getInt(MUSICID));
             setTitle(rs.getString("musictitle"));
             setAuthor(rs.getString("groupname"));
+            setArtist(rs.getString("artistname"));
             setAlbum(rs.getString("albumtitle"));
             setYear(rs.getInt(YEAR));
             setGenre(rs.getString("genrename"));
@@ -37,6 +48,9 @@ public class MusicStrings {
     }
 
     public void setMusicId(Integer musicId) {
+        if(musicId < 0) {
+            throw new IllegalArgumentException("MusicId deve essere > 0.");
+        }
         this.musicId = musicId;
     }
 
@@ -45,6 +59,9 @@ public class MusicStrings {
     }
 
     public void setTitle(String title) {
+        if(title.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 30.");
+        }
         this.title = title;
     }
 
@@ -53,6 +70,9 @@ public class MusicStrings {
     }
 
     public void setAuthor(String author) {
+        if(author.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome autore (gruppo) deve essere < 30.");
+        }
         this.author = author;
     }
 
@@ -61,7 +81,21 @@ public class MusicStrings {
     }
 
     public void setAlbum(String album) {
+        if(album != null && album.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 30.");
+        }
         this.album = album;
+    }
+
+    public String getArtist() {
+        return artist;
+    }
+
+    public void setArtist(String artist) {
+        if(artist.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome artista album deve essere < 30.");
+        }
+        this.artist = artist;
     }
 
     public Integer getYear() {
@@ -69,6 +103,9 @@ public class MusicStrings {
     }
 
     public void setYear(Integer year) {
+        if(year < 0 || year > 3000) {
+            throw new IllegalArgumentException("Anno musica deve essere compreso fra 0 e 3000.");
+        }
         this.year = year;
     }
 
@@ -77,6 +114,9 @@ public class MusicStrings {
     }
 
     public void setGenre(String genre) {
+        if(genre.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 30.");
+        }
         this.genre = genre;
     }
 }

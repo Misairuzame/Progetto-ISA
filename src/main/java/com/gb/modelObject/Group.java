@@ -28,8 +28,8 @@ public class Group {
     }
 
     public Group(Integer groupId, String name) {
-        this.groupId = groupId;
-        this.name = name;
+        setGroupId(groupId);
+        setName(name);
     }
 
     public Integer getGroupId() {
@@ -37,6 +37,9 @@ public class Group {
     }
 
     public void setGroupId(Integer groupId) {
+        if(groupId < 0) {
+            throw new IllegalArgumentException("GroupId deve essere > 0.");
+        }
         this.groupId = groupId;
     }
 
@@ -45,6 +48,9 @@ public class Group {
     }
 
     public void setName(String name) {
+        if(name.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome gruppo deve essere < 30.");
+        }
         this.name = name;
     }
 

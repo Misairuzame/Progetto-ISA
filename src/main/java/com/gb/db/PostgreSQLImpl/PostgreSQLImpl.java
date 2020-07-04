@@ -224,7 +224,7 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
             ps.setInt(1, music.getMusicId());
             ps.setString(2, music.getTitle());
             ps.setInt(3, music.getAuthorId());
-            if (music.getAlbumId() < 0) {
+            if (music.getAlbumId() == null) {
                 ps.setNull(4, Types.INTEGER);
             } else {
                 ps.setInt(4, music.getAlbumId());
@@ -281,6 +281,51 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
         return 0;
     }
 
+    /**
+     * La query SQL che viene eseguita è la seguente:<br/>
+     *<br/>
+     * SELECT *<br/>
+     * FROM<br/>
+     * (<br/>
+     * &emsp;SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, 'Vari artisti' AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename<br/>
+     * &emsp;FROM<br/>
+     * &emsp;music AS M LEFT JOIN album AS AL ON M.albumid = AL.albumid<br/>
+     * &emsp;JOIN grouptable AS GR ON M.authorid = GR.groupid<br/>
+     * &emsp;JOIN genre AS GE ON M.genreid = GE.genreid<br/>
+     * ) AS temp1<br/>
+     * WHERE (temp1.musictitle ~* ?<br/>
+     * OR temp1.groupname ~* ?<br/>
+     * OR temp1.albumtitle ~* ?<br/>
+     * OR temp1.genrename ~* ?)<br/>
+     * AND temp1.musicid NOT IN (<br/>
+     * &emsp;SELECT M.musicid<br/>
+     * &emsp;FROM<br/>
+     * &emsp;music AS M JOIN grouptable AS GR ON M.authorid = GR.groupid<br/>
+     * &emsp;JOIN artist AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?<br/>
+     * )<br/>
+     *<br/>
+     * UNION<br/>
+     *<br/>
+     * SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AR.name AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename<br/>
+     * FROM<br/>
+     * music AS M LEFT JOIN album AS AL ON M.albumid = AL.albumid<br/>
+     * JOIN grouptable AS GR ON M.authorid = GR.groupid<br/>
+     * JOIN genre AS GE ON M.genreid = GE.genreid<br/>
+     * JOIN artist AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?<br/>
+     *<br/>
+     * ORDER BY musicid<br/>
+     * LIMIT 10 OFFSET 0<br/>
+     *<br/>
+     * <b>Spiegazione</b>: Per permettere all'utente di cercare anche le canzoni di un certo artista, è necessario fare il join
+     * fra la tabella music, la tabella grouptable e la tabella artist (c'è una gerarchia). Visto che una canzone può
+     * avere più di un artista (una canzone ha un autore, che è un gruppo, il quale può essere composto da più artisti)
+     * una query più semplice restituirebbe delle righe duplicate, perchè si avrebbero più righe per la stessa canzone dove
+     * l'unica differenza è la colonna autore. In questo modo, invece, una canzone viene mostrata o se è stata composta
+     * dall'artista cercato (in questo caso nella colonna artista si mostra il suo nome), o se qualsiasi altro campo di
+     * ricerca fa match (in questo caso nella colonna artista si scrive 'vari artisti').
+     * L'unico caso in cui vengono restituite più righe per la stessa musica è quando la stringa cercata fa match con
+     * più di uno degli autori che hanno composto insieme una certa canzone. Questo comportamento è voluto.
+     */
     @Override
     public List<MusicStrings> searchMusic(String searchTerm, int page) {
         List<MusicStrings> musicList = new ArrayList<>();
@@ -288,24 +333,45 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
 
         String sql =
                 " SELECT * " +
-                " FROM ( " +
-                    " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
-                    " FROM " + MUSIC_TABLE + " AS M, " + GROUP_TABLE + " AS GR, " + GENRE_TABLE + " AS GE, " + ALBUM_TABLE + " AS AL " +
-                    " WHERE M.authorid = GR.groupid AND M.genreid = GE.genreid AND M.albumid = AL.albumid " +
-                    " ) AS temp" +
-                " WHERE temp.musictitle ~* ? " +
-                " OR temp.groupname ~* ? " +
-                " OR temp.albumtitle ~* ? " +
-                " OR temp.genrename ~* ? " +
-                " LIMIT ? OFFSET ? ";
+                        " FROM " +
+                        " ( " +
+                        " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, 'Vari artisti' AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
+                        " FROM " +
+                         MUSIC_TABLE + " AS M LEFT JOIN " + ALBUM_TABLE + " AS AL ON M.albumid = AL.albumid " +
+                        " JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
+                        " JOIN " + GENRE_TABLE + " AS GE ON M.genreid = GE.genreid " +
+                        ") AS temp1 " +
+                        " WHERE (temp1.musictitle ~* ? " +
+                        " OR temp1.groupname ~* ? " +
+                        " OR temp1.albumtitle ~* ? " +
+                        " OR temp1.genrename ~* ?) " +
+                        " AND temp1.musicid NOT IN ( " +
+                        " SELECT M.musicid " +
+                        " FROM " +
+                         MUSIC_TABLE + " AS M JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
+                        " JOIN " + ARTIST_TABLE + " AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?" +
+                        " ) " +
+
+                        " UNION " +
+
+                        " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AR.name AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
+                        " FROM " +
+                         MUSIC_TABLE + " AS M LEFT JOIN " + ALBUM_TABLE + " AS AL ON M.albumid = AL.albumid " +
+                        " JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
+                        " JOIN " + GENRE_TABLE + " AS GE ON M.genreid = GE.genreid " +
+                        " JOIN " + ARTIST_TABLE + " AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?" +
+                        " ORDER BY musicid " +
+                        " LIMIT ? OFFSET ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, searchTerm);
             ps.setString(2, searchTerm);
             ps.setString(3, searchTerm);
             ps.setString(4, searchTerm);
-            ps.setInt(5, PAGE_SIZE);
-            ps.setInt(6, page*PAGE_SIZE);
+            ps.setString(5, searchTerm);
+            ps.setString(6, searchTerm);
+            ps.setInt(7, PAGE_SIZE);
+            ps.setInt(8, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     musicList.add(new MusicStrings(rs));

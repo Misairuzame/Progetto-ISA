@@ -37,6 +37,9 @@ public class Link {
     }
 
     public void setMusicId(Integer musicId) {
+        if(musicId < 0) {
+            throw new IllegalArgumentException("Link.musicId deve essere > 0.");
+        }
         this.musicId = musicId;
     }
 
@@ -45,6 +48,9 @@ public class Link {
     }
 
     public void setLink(String link) {
+        if(link != null && link.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza link deve essere < 100.");
+        }
         this.link = link;
     }
 

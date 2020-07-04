@@ -2,6 +2,8 @@ package unit;
 
 import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
 import com.gb.modelObject.Music;
+import com.gb.modelObject.MusicStrings;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -10,15 +12,25 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static com.gb.Constants.*;
 
+/**
+ * I test per le funzioni di inserimento, aggiornamento
+ * ed eliminazione vengono fatti tutti insieme in un
+ * integration test (PostgresAndModelTest)
+ */
 class PostgreSQLImplTest {
+
+    private static PostgreSQLImpl database;
+
+    @BeforeAll
+    public static void createDb() {
+        System.out.println("[Unit test] PostgreSQLImplTest");
+        database = PostgreSQLImpl.getInstance();
+
+        assertNotNull(database);
+    }
 
     @Test
     void getAllMusic() {
-        System.out.println(this.getClass() + " getAllMusic()");
-        PostgreSQLImpl database = PostgreSQLImpl.getInstance();
-
-        assertNotNull(database);
-
         List<Music> musicList = database.getAllMusic(0);
 
         assertTrue(musicList.size() <= PAGE_SIZE,
@@ -27,11 +39,6 @@ class PostgreSQLImplTest {
 
     @Test
     void getMusicById() {
-        System.out.println(this.getClass() + " getMusicById()");
-        PostgreSQLImpl database = PostgreSQLImpl.getInstance();
-
-        assertNotNull(database);
-
         List<Music> musicList = database.getMusicById(1234);
 
         assertEquals(1, musicList.size(),
@@ -39,23 +46,13 @@ class PostgreSQLImplTest {
     }
 
     @Test
-    void updateMusic() {
-    }
-
-    @Test
-    void insertMusic() {
-    }
-
-    @Test
-    void deleteMusic() {
-    }
-
-    @Test
     void searchMusic() {
-        System.out.println(this.getClass() + " searchMusic()");
-        PostgreSQLImpl database = PostgreSQLImpl.getInstance();
+        final String searchString = "m";
 
-        assertNotNull(database);
+        List<MusicStrings> musicList = database.searchMusic(searchString, 0);
+
+        assertFalse(musicList.isEmpty(),
+                "La ricerca di 'm' dovrebbe restituire almeno 1 risultato.");
 
         assertDoesNotThrow(() -> {
             database.searchMusic("\\ ' \" \n \t ! £ $ % & / ( ) = ? ^ [ ] { } ; - _ . § ç ° +",0);

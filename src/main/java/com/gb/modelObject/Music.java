@@ -26,7 +26,11 @@ public class Music {
             setMusicId(rs.getInt(MUSICID));
             setTitle(rs.getString(TITLE));
             setAuthorId(rs.getInt(AUTHORID));
-            setAlbumId(rs.getInt(ALBUMID));
+            if(rs.getString(ALBUMID) == null) {
+                setAlbumId(null);
+            } else {
+                setAlbumId(rs.getInt(ALBUMID));
+            }
             setYear(rs.getInt(YEAR));
             setGenreId(rs.getInt(GENREID));
         } catch(SQLException e) {
@@ -35,12 +39,12 @@ public class Music {
     }
 
     public Music(Integer musicId, String title, Integer authorId, Integer albumId, Integer year, Integer genreId) {
-        this.musicId = musicId;
-        this.title = title;
-        this.authorId = authorId;
-        this.albumId = albumId;
-        this.year = year;
-        this.genreId = genreId;
+        setMusicId(musicId);
+        setTitle(title);
+        setAuthorId(authorId);
+        setAlbumId(albumId);
+        setYear(year);
+        setGenreId(genreId);
     }
 
     public Integer getMusicId() {
@@ -48,6 +52,9 @@ public class Music {
     }
 
     public void setMusicId(Integer musicId) {
+        if(musicId < 0) {
+            throw new IllegalArgumentException("MusicId deve essere > 0.");
+        }
         this.musicId = musicId;
     }
 
@@ -56,6 +63,9 @@ public class Music {
     }
 
     public void setTitle(String title) {
+        if(title.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 30.");
+        }
         this.title = title;
     }
 
@@ -64,6 +74,9 @@ public class Music {
     }
 
     public void setAuthorId(Integer authorId) {
+        if(authorId < 0) {
+            throw new IllegalArgumentException("Music.authorId deve essere > 0.");
+        }
         this.authorId = authorId;
     }
 
@@ -72,6 +85,9 @@ public class Music {
     }
 
     public void setAlbumId(Integer albumId) {
+        if(albumId != null && albumId < 0) {
+            throw new IllegalArgumentException("Music.albumId, se specificato, deve essere > 0.");
+        }
         this.albumId = albumId;
     }
 
@@ -80,6 +96,9 @@ public class Music {
     }
 
     public void setYear(Integer year) {
+        if(year < 0 || year > 3000) {
+            throw new IllegalArgumentException("Anno musica deve essere compreso fra 0 e 3000.");
+        }
         this.year = year;
     }
 
@@ -88,6 +107,9 @@ public class Music {
     }
 
     public void setGenreId(Integer genreId) {
+        if(genreId < 0) {
+            throw new IllegalArgumentException("Music.genreId deve essere > 0.");
+        }
         this.genreId = genreId;
     }
 

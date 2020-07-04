@@ -28,8 +28,8 @@ public class Genre {
     }
 
     public Genre(Integer genreId, String name) {
-        this.genreId = genreId;
-        this.name = name;
+        setGenreId(genreId);
+        setName(name);
     }
 
     public Integer getGenreId() {
@@ -37,6 +37,9 @@ public class Genre {
     }
 
     public void setGenreId(Integer genreId) {
+        if(genreId < 0) {
+            throw new IllegalArgumentException("GenreId deve essere > 0.");
+        }
         this.genreId = genreId;
     }
 
@@ -45,6 +48,9 @@ public class Genre {
     }
 
     public void setName(String name) {
+        if(name.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 30.");
+        }
         this.name = name;
     }
 

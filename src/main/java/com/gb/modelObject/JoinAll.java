@@ -20,14 +20,14 @@ public class JoinAll {
 
     public JoinAll(ResultSet rs) {
         try {
-            this.musicId = rs.getInt("musicid");
-            this.musicTitle = rs.getString("musictitle");
-            this.groupName = rs.getString("groupname");
-            this.numArtists = rs.getInt("numartisti");
-            this.albumTitle = rs.getString("albumtitle");
-            this.year = rs.getInt("year");
-            this.genreName = rs.getString("genrename");
-            this.numLinks = rs.getInt("numlink");
+            setMusicId(rs.getInt("musicid"));
+            setMusicTitle(rs.getString("musictitle"));
+            setGroupName(rs.getString("groupname"));
+            setNumArtists(rs.getInt("numartisti"));
+            setAlbumTitle(rs.getString("albumtitle"));
+            setYear(rs.getInt("year"));
+            setGenreName(rs.getString("genrename"));
+            setNumLinks(rs.getInt("numlink"));
         } catch (SQLException e) {
             logger.error("Error creating JoinAll object: {}", e.getMessage());
         }
@@ -63,5 +63,61 @@ public class JoinAll {
 
     public int getNumLinks() {
         return numLinks;
+    }
+
+    public void setMusicId(int musicId) {
+        if(musicId < 0) {
+            throw new IllegalArgumentException("MusicId deve essere > 0.");
+        }
+        this.musicId = musicId;
+    }
+
+    public void setMusicTitle(String musicTitle) {
+        if(musicTitle.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 30.");
+        }
+        this.musicTitle = musicTitle;
+    }
+
+    public void setGroupName(String groupName) {
+        if(groupName.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome gruppo deve essere < 30.");
+        }
+        this.groupName = groupName;
+    }
+
+    public void setNumArtists(int numArtists) {
+        if(numArtists < 0) {
+            throw new IllegalArgumentException("Numero artisti deve essere >= 0.");
+        }
+        this.numArtists = numArtists;
+    }
+
+    public void setAlbumTitle(String albumTitle) {
+        if(albumTitle != null && albumTitle.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 30.");
+        }
+        this.albumTitle = albumTitle;
+    }
+
+    public void setYear(int year) {
+        if(year < 0 || year > 3000) {
+            throw new IllegalArgumentException("Anno musica deve essere compreso fra 0 e 3000.");
+        }
+        this.year = year;
+    }
+
+    public void setGenreName(String genreName) {
+        if(genreName.length() > 30) {
+            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 30.");
+        }
+        this.genreName = genreName;
+    }
+
+    public void setNumLinks(int numLinks) {
+        if(numLinks < 0) {
+            throw new IllegalArgumentException("Numero di link deve essere > 0.");
+        }
+        this.numLinks = numLinks;
     }
 }

@@ -148,7 +148,8 @@ public class Main {
 
     private static String handleParseError(Request req, Response res) {
         return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
-                "Errore nella deserializzazione dei parametri inviati.");
+                "Errore nella deserializzazione dei parametri inviati.\n" +
+                        "Specificare i parametri in maniera corretta.");
     }
 
     private static String getHomepage(Request req, Response res) {
@@ -251,7 +252,7 @@ public class Main {
         }
 
         if(req.queryParams("page") != null) {
-            if(!isNumber(req.queryParams("page"))) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -322,11 +323,11 @@ public class Main {
             if (req.queryParams(ALBUMID) != null && !req.queryParams(ALBUMID).equals("")) {
                 musicToAdd.setAlbumId(Integer.parseInt(req.queryParams(ALBUMID)));
             } else {
-                musicToAdd.setAlbumId(-1000);
+                musicToAdd.setAlbumId(null);
             }
             musicToAdd.setYear(Integer.parseInt(req.queryParams(YEAR)));
             musicToAdd.setGenreId(Integer.parseInt(req.queryParams(GENREID)));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione della musica da inserire");
             return handleParseError(req, res);
         }
@@ -360,11 +361,11 @@ public class Main {
             if (req.queryParams(ALBUMID) != null && !req.queryParams(ALBUMID).equals("")) {
                 musicToUpdate.setAlbumId(Integer.parseInt(req.queryParams(ALBUMID)));
             } else {
-                musicToUpdate.setAlbumId(-1000);
+                musicToUpdate.setAlbumId(null);
             }
             musicToUpdate.setYear(Integer.parseInt(req.queryParams(YEAR)));
             musicToUpdate.setGenreId(Integer.parseInt(req.queryParams(GENREID)));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione della musica da aggiornare");
             return handleParseError(req, res);
         }
@@ -391,7 +392,7 @@ public class Main {
             return handleInternalError(req, res);
         }
 
-        if(req.queryParams(MUSICID) == null || !isNumber(req.queryParams(MUSICID))) {
+        if(req.queryParams(MUSICID) == null || !isNonNegativeInteger(req.queryParams(MUSICID))) {
             return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                     "Specificare un id nel formato corretto.");
         }
@@ -423,7 +424,7 @@ public class Main {
         }
 
         if(req.queryParams("page") != null) {
-            if(!isNumber(req.queryParams("page"))) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -489,7 +490,7 @@ public class Main {
             albumToAdd.setTitle(URLDecoder.decode(req.queryParams(TITLE), "UTF-8"));
             albumToAdd.setYear(Integer.parseInt(req.queryParams(YEAR)));
             albumToAdd.setGroupId(Integer.parseInt(req.queryParams(GROUPID)));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione dell' album da inserire");
             return handleParseError(req, res);
         }
@@ -515,7 +516,7 @@ public class Main {
             return handleInternalError(req, res);
         }
 
-        if(req.queryParams(ALBUMID) == null || !isNumber(req.queryParams(ALBUMID))) {
+        if(req.queryParams(ALBUMID) == null || !isNonNegativeInteger(req.queryParams(ALBUMID))) {
             return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                     "Specificare un id nel formato corretto.");
         }
@@ -572,7 +573,7 @@ public class Main {
             artistToUpdate.setArtistId(Integer.parseInt(req.queryParams(ARTISTID)));
             artistToUpdate.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
             artistToUpdate.setGroupId(Integer.parseInt(req.queryParams(GROUPID)));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione dell' artista da aggiornare");
             return handleParseError(req, res);
         }
@@ -604,7 +605,7 @@ public class Main {
             artistToAdd.setArtistId(Integer.parseInt(req.queryParams(ARTISTID)));
             artistToAdd.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
             artistToAdd.setGroupId(Integer.parseInt(req.queryParams(GROUPID)));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione dell' artista da inserire");
             return handleParseError(req, res);
         }
@@ -657,7 +658,7 @@ public class Main {
         try {
             groupToAdd.setGroupId(Integer.parseInt(req.queryParams(GROUPID)));
             groupToAdd.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione del gruppo da inserire");
             return handleParseError(req, res);
         }
@@ -710,7 +711,7 @@ public class Main {
         try {
             genreToAdd.setGenreId(Integer.parseInt(req.queryParams(GENREID)));
             genreToAdd.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
-        } catch (NumberFormatException | UnsupportedEncodingException e) {
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione del genere da inserire");
             return handleParseError(req, res);
         }
