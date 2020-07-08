@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ArtistDAO {
 
-    List<Artist> getAllArtists();
+    List<Artist> getAllArtists(int page);
 
-    List<ArtistJoinGroup> artistJoinGroup();
+    List<ArtistJoinGroup> artistJoinGroup(int page);
 
     int updateArtist(Artist artist);
 

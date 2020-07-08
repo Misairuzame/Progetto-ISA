@@ -1,6 +1,6 @@
 package integration;
 
-import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
+import com.gb.db.Database;
 import com.gb.modelObject.Album;
 import com.gb.modelObject.Genre;
 import com.gb.modelObject.Group;
@@ -20,14 +20,14 @@ import static org.junit.jupiter.api.Assertions.*;
  * di test prevede che funzioni correttamente la ricerca, l'inserimento,
  * la modifica e l'eliminazione di dati dal database.
  */
-class PostgresAndModelTest {
+class DatabaseAndModelTest {
 
-    private static PostgreSQLImpl database;
+    private static Database database;
 
     @BeforeAll
     static void printName() {
-        System.out.println("[Integration test] PostgresAndModelTest");
-        database = PostgreSQLImpl.getInstance();
+        System.out.println("[Integration test] DatabaseAndModelTest");
+        database = Database.getDatabase();
 
         assertNotNull(database);
     }
@@ -37,9 +37,9 @@ class PostgresAndModelTest {
         final int musicId = Integer.MAX_VALUE;
         Random rand = new Random();
 
-        List<Album> albumList = database.getAllAlbums();
-        List<Group> groupList = database.getAllGroups();
-        List<Genre> genreList = database.getAllGenres();
+        List<Album> albumList = database.getAllAlbums(0);
+        List<Group> groupList = database.getAllGroups(0);
+        List<Genre> genreList = database.getAllGenres(0);
 
         assertNotNull(albumList);
         assertNotNull(groupList);

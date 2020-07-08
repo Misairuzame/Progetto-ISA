@@ -19,9 +19,9 @@ public interface MusicDAO {
 
     int deleteMusic(int id);
 
-    List<JoinAll> joinAll();
+    List<JoinAll> joinAll(int page);
 
-    List<MusicJoinLink> musicJoinLink();
+    List<MusicJoinLink> musicJoinLink(int page);
 
     List<MusicStrings> searchMusic(String searchTerm, int page);
 

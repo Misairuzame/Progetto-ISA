@@ -6,6 +6,10 @@ import java.util.List;
 
 public interface LinkDAO {
 
-    List<Link> getAllLinks();
+    List<Link> getAllLinks(int page);
+
+    List<Link> getLinksForMusic(int musicId);
+
+    int insertLink(Link link);
 
 }

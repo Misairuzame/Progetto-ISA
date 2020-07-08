@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GroupDAO {
 
-    List<Group> getAllGroups();
+    List<Group> getAllGroups(int page);
 
     List<Group> getGroupById(int groupId);
 

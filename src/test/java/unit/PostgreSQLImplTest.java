@@ -1,6 +1,7 @@
 package unit;
 
 import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
+import com.gb.modelObject.Link;
 import com.gb.modelObject.Music;
 import com.gb.modelObject.MusicStrings;
 import org.junit.jupiter.api.BeforeAll;
@@ -57,5 +58,18 @@ class PostgreSQLImplTest {
         assertDoesNotThrow(() -> {
             database.searchMusic("\\ ' \" \n \t ! £ $ % & / ( ) = ? ^ [ ] { } ; - _ . § ç ° +",0);
         }, "Non vengono cercati correttamente dei caratteri speciali.");
+    }
+
+    @Test
+    void getLinksForMusic() {
+        final int musicId = 357357;
+
+        List<Link> linkList = database.getLinksForMusic(musicId);
+
+        assertFalse(linkList.isEmpty(),
+                "Dovrebbe essere restituito almeno un link.");
+
+        assertEquals(musicId, linkList.get(0).getMusicId(),
+                "Il musicId specificato e quello del link recuperato devono coincidere.");
     }
 }

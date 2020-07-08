@@ -1,6 +1,8 @@
 package com.gb.restApp;
 
 import static spark.Spark.*;
+
+import com.gb.db.Database;
 import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
 import com.gb.modelObject.*;
 import com.google.common.io.ByteStreams;
@@ -63,7 +65,7 @@ public class Main {
 
         get("/genre",  Main::dispatchGenre);
 
-        get("/link",  Main::getLinks);
+        get("/link",  Main::dispatchLink);
 
         get("/mjoinl", Main::musicJoinLink);
 
@@ -72,6 +74,8 @@ public class Main {
         get("/joinall", Main::joinAll);
 
         get("/search", Main::searchMusic);
+
+        get("/viewlinks", Main::viewLinks);
 
         get("/favicon.ico", Main::favicon);
 
@@ -224,6 +228,15 @@ public class Main {
                 "Metodo HTTP non supportato.");
     }
 
+    private static String dispatchLink(Request req, Response res) {
+        String userMethod = req.queryParamOrDefault("method", "GET");
+        if(userMethod.equalsIgnoreCase(GET))    return getLinks(req, res);
+        if(userMethod.equalsIgnoreCase(POST))   return insertLink(req, res);
+
+        return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
+                "Metodo HTTP non supportato.");
+    }
+
 
     /**
      * Sezione per la visualizzazione dei form
@@ -244,13 +257,12 @@ public class Main {
      */
 
     private static String getMusic(Request req, Response res) {
-        int pageNum = 0;
-
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
+        int pageNum = 0;
         if(req.queryParams("page") != null) {
             if(!isNonNegativeInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
@@ -278,7 +290,7 @@ public class Main {
     }
 
     private static String getMusicById(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -305,12 +317,11 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("musicList", musicList);
-        model.put("page", -100);
         return engine.render(new ModelAndView(model, "musicList"));
     }
 
     private static String insertMusic(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -348,7 +359,7 @@ public class Main {
     }
 
     private static String updateMusic(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -387,7 +398,7 @@ public class Main {
     }
 
     private static String deleteMusic(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -418,7 +429,7 @@ public class Main {
     private static String searchMusic(Request req, Response res) {
         int pageNum = 0;
 
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -456,12 +467,21 @@ public class Main {
     }
 
     private static String getAlbums(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
-        List<Album> albumList = db.getAllAlbums();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<Album> albumList = db.getAllAlbums(pageNum);
         if (albumList == null) {
             return handleInternalError(req, res);
         }
@@ -475,11 +495,12 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("albumList", albumList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "albumList"));
     }
 
     private static String insertAlbum(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -511,7 +532,7 @@ public class Main {
     }
 
     private static String deleteAlbum(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -540,12 +561,21 @@ public class Main {
     }
 
     private static String getArtists(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
-        List<Artist> artistList = db.getAllArtists();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<Artist> artistList = db.getAllArtists(pageNum);
         if (artistList == null) {
             return handleInternalError(req, res);
         }
@@ -559,11 +589,12 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("artistList", artistList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "artistList"));
     }
 
     private static String updateArtist(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -595,7 +626,7 @@ public class Main {
     }
 
     private static String insertArtist(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -626,12 +657,21 @@ public class Main {
     }
 
     private static String getGroups(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
-        List<Group> groupList = db.getAllGroups();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<Group> groupList = db.getAllGroups(pageNum);
         if (groupList == null) {
             return handleInternalError(req, res);
         }
@@ -645,11 +685,12 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("groupList", groupList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "groupList"));
     }
 
     private static String insertGroup(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -679,12 +720,21 @@ public class Main {
     }
 
     private static String getGenres(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
-        List<Genre> genreList = db.getAllGenres();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<Genre> genreList = db.getAllGenres(pageNum);
         if (genreList == null) {
             return handleInternalError(req, res);
         }
@@ -698,11 +748,12 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("genreList", genreList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "genreList"));
     }
 
     private static String insertGenre(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
@@ -732,12 +783,21 @@ public class Main {
     }
 
     private static String getLinks(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
-        List<Link> linkList = db.getAllLinks();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<Link> linkList = db.getAllLinks(pageNum);
         if (linkList == null) {
             return handleInternalError(req, res);
         }
@@ -751,16 +811,52 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("linkList", linkList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "linkList"));
     }
 
+    private static String insertLink(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        Link linkToAdd = new Link();
+        try {
+            linkToAdd.setMusicId(Integer.parseInt(req.queryParams(MUSICID)));
+            linkToAdd.setLink(URLDecoder.decode(req.queryParams(LINK), "UTF-8"));
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            logger.warn("Errore nella deserializzazione del link da inserire");
+            return handleParseError(req, res);
+        }
+
+        int result = db.insertLink(linkToAdd);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+        }
+
+        return returnMessage(req, res, SC_CREATED, "text-success",
+                "Link per la canzone "+ linkToAdd.getMusicId()+" aggiunto con successo.");
+    }
+
     private static String musicJoinLink(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if(db == null) {
             return handleInternalError(req, res);
         }
 
-        List<MusicJoinLink> musicJoinLinkList = db.musicJoinLink();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<MusicJoinLink> musicJoinLinkList = db.musicJoinLink(pageNum);
         if (musicJoinLinkList == null) {
             return handleInternalError(req, res);
         }
@@ -774,16 +870,26 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("musicJoinLinkList", musicJoinLinkList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "musicJoinLink"));
     }
 
     private static String artistJoinGroup(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if(db == null) {
             return handleInternalError(req, res);
         }
 
-        List<ArtistJoinGroup> artistJoinGroupList = db.artistJoinGroup();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<ArtistJoinGroup> artistJoinGroupList = db.artistJoinGroup(pageNum);
         if (artistJoinGroupList == null) {
             return handleInternalError(req, res);
         }
@@ -797,16 +903,26 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("artistJoinGroupList", artistJoinGroupList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "artistJoinGroup"));
     }
 
     private static String joinAll(Request req, Response res) {
-        PostgreSQLImpl db = PostgreSQLImpl.getInstance();
+        Database db = Database.getDatabase();
         if(db == null) {
             return handleInternalError(req, res);
         }
 
-        List<JoinAll> joinAllList = db.joinAll();
+        int pageNum = 0;
+        if(req.queryParams("page") != null) {
+            if(!isNonNegativeInteger(req.queryParams("page"))) {
+                return handleParseError(req, res);
+            } else {
+                pageNum = Integer.parseInt(req.queryParams("page"));
+            }
+        }
+
+        List<JoinAll> joinAllList = db.joinAll(pageNum);
         if (joinAllList == null) {
             return handleInternalError(req, res);
         }
@@ -820,7 +936,42 @@ public class Main {
 
         Map<String, Object> model = new HashMap<>();
         model.put("joinAllList", joinAllList);
+        model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "joinAll"));
+    }
+
+    private static String viewLinks(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        int musicId;
+        try {
+            musicId = Integer.parseInt(req.queryParams(MUSICID));
+        } catch (IllegalArgumentException e) {
+            logger.warn("Errore nella deserializzazione dell'id della musica.");
+            return handleParseError(req, res);
+        }
+
+        Music music = db.getMusicById(musicId).get(0);
+
+        List<Link> linkList = db.getLinksForMusic(musicId);
+        if (linkList == null) {
+            return handleInternalError(req, res);
+        }
+        if (linkList.isEmpty()) {
+            return handleNotFound(req, res);
+        }
+
+        res.status(SC_OK);
+
+        info(linkList.toString());
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("linkList", linkList);
+        model.put("music", music);
+        return engine.render(new ModelAndView(model, "linksformusic"));
     }
 
     /**

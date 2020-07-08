@@ -1,6 +1,5 @@
 package com.gb.db.PostgreSQLImpl;
 
-import com.gb.DAO.*;
 import com.gb.modelObject.*;
 import org.postgresql.ds.PGSimpleDataSource;
 import org.slf4j.Logger;
@@ -14,25 +13,23 @@ import java.util.List;
 
 import static com.gb.Constants.*;
 
-public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, GenreDAO, LinkDAO {
+public class PostgreSQLImpl extends com.gb.db.Database {
 
-    public static Connection conn = null;
-    public static PostgreSQLImpl Database = null;
+    private static Connection conn = null;
+    private static PostgreSQLImpl postgresInstance = null;
     private static final Logger logger = LoggerFactory.getLogger(PostgreSQLImpl.class);
 
     public static synchronized PostgreSQLImpl getInstance() {
-
-        if(Database == null) {
-            Database = new PostgreSQLImpl();
+        if(postgresInstance == null) {
+            postgresInstance = new PostgreSQLImpl();
             if (conn == null) {
                 return null;
             }
         }
-        return Database;
-
+        return postgresInstance;
     }
 
-    private PostgreSQLImpl() {
+    public PostgreSQLImpl() {
 
         try {
             BufferedReader br = new BufferedReader(new FileReader("creds.txt"));
@@ -61,6 +58,10 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
             conn = null;
         }
 
+    }
+
+    public static Connection getConnection() {
+        return conn;
     }
 
     @Override
@@ -111,7 +112,7 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<JoinAll> joinAll() {
+    public List<JoinAll> joinAll(int page) {
         List<JoinAll> musicList = new ArrayList<>();
 
         String sql =
@@ -127,9 +128,12 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
                 " ) as tmptable ON (M.authorid = tmpgrid) " +
                 " INNER JOIN genre AS Ge ON (M.genreid = Ge.genreid) " +
                 " LEFT JOIN link AS L on (M.musicid = L.musicid) " +
-                " GROUP BY M.musicid, tmptable.groupname, Al.title, Ge.name, tmptable.numartisti ";
+                " GROUP BY M.musicid, tmptable.groupname, Al.title, Ge.name, tmptable.numartisti " +
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     musicList.add(new JoinAll(rs));
@@ -385,14 +389,17 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<Album> getAllAlbums() {
+    public List<Album> getAllAlbums(int page) {
         List<Album> albumList = new ArrayList<>();
 
         String sql =
                 " SELECT * " +
-                " FROM "  + ALBUM_TABLE;
+                " FROM " + ALBUM_TABLE +
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     albumList.add(new Album(rs));
@@ -514,14 +521,17 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<Artist> getAllArtists() {
+    public List<Artist> getAllArtists(int page) {
         List<Artist> artistList = new ArrayList<>();
 
         String sql =
                 " SELECT * " +
-                " FROM "  + ARTIST_TABLE;
+                " FROM " + ARTIST_TABLE +
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     artistList.add(new Artist(rs));
@@ -535,15 +545,18 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<ArtistJoinGroup> artistJoinGroup() {
+    public List<ArtistJoinGroup> artistJoinGroup(int page) {
         List<ArtistJoinGroup> list = new ArrayList<>();
 
         String sql =
                 " SELECT A."+ARTISTID+", A."+NAME+", A."+GROUPID+", G."+NAME+
                 " FROM "+ARTIST_TABLE+" as A LEFT JOIN "+GROUP_TABLE+" as G" +
-                " ON A."+GROUPID+" = G."+GROUPID;
+                " ON A."+GROUPID+" = G."+GROUPID+
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     list.add(new ArtistJoinGroup(rs));
@@ -645,14 +658,17 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<Genre> getAllGenres() {
+    public List<Genre> getAllGenres(int page) {
         List<Genre> genreList = new ArrayList<>();
 
         String sql =
                 " SELECT * " +
-                " FROM "  + GENRE_TABLE;
+                " FROM " + GENRE_TABLE +
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     genreList.add(new Genre(rs));
@@ -732,14 +748,17 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<Group> getAllGroups() {
+    public List<Group> getAllGroups(int page) {
         List<Group> groupList = new ArrayList<>();
 
         String sql =
                 " SELECT * " +
-                " FROM "  + GROUP_TABLE;
+                " FROM " + GROUP_TABLE +
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     groupList.add(new Group(rs));
@@ -819,14 +838,17 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<Link> getAllLinks() {
+    public List<Link> getAllLinks(int page) {
         List<Link> linkList = new ArrayList<>();
 
         String sql =
                 " SELECT * " +
-                " FROM "  + LINK_TABLE;
+                " FROM " + LINK_TABLE +
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     linkList.add(new Link(rs));
@@ -840,15 +862,41 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
     }
 
     @Override
-    public List<MusicJoinLink> musicJoinLink() {
+    public List<Link> getLinksForMusic(int musicId) {
+        List<Link> linkList = new ArrayList<>();
+
+        String sql =
+                " SELECT * " +
+                " FROM " + LINK_TABLE +
+                " WHERE " + MUSICID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, musicId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    linkList.add(new Link(rs));
+                }
+            }
+            return linkList;
+        } catch (SQLException e) {
+            logger.error("Error in getLinksForMusic: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<MusicJoinLink> musicJoinLink(int page) {
         List<MusicJoinLink> musicList = new ArrayList<>();
 
         String sql =
                 " SELECT M."+MUSICID+", M."+TITLE+", M."+AUTHORID+", M."+ALBUMID+", M."+YEAR+", M."+GENREID+", L."+LINK+
                 " FROM "+MUSIC_TABLE+" as M LEFT JOIN "+LINK+" as L" +
-                " ON M."+MUSICID+" = L."+MUSICID;
+                " ON M."+MUSICID+" = L."+MUSICID+
+                " LIMIT ? OFFSET ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, PAGE_SIZE);
+            ps.setInt(2, page*PAGE_SIZE);
             try (ResultSet rs = ps.executeQuery()) {
                 while(rs.next()) {
                     musicList.add(new MusicJoinLink(rs));
@@ -859,6 +907,26 @@ public class PostgreSQLImpl implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, 
             logger.error("Error in musicJoinLink: {}", e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public int insertLink(Link link) {
+        String sql =
+                " INSERT INTO " + LINK_TABLE +
+                " ( " + MUSICID + ", " + LINK +
+                " ) VALUES (?,?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, link.getMusicId());
+            ps.setString(2, link.getLink());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Exception in insertLink: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
     }
 
 }

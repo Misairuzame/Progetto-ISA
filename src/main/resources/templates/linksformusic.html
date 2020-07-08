@@ -1,21 +1,17 @@
 <div th:replace="header"/>
 
-<h1 class="display-1 text-primary">Tabella Link</h1>
+<h1 class="display-3 text-primary" th:text="'Link per la canzone '+${music.getTitle()}"></h1>
 <table align="center" class="table table-striped table-dark table-hover" width="50%" cellpadding="5">
     <thead class="bg-primary">
     <tr>
-        <th>MusicID</th>
         <th>Link</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="link: ${linkList}">
-        <td th:text="${link.getMusicId()}"/>
-        <td th:text="${link.getLink()}"/>
+        <td> <a th:href="${link.getLink()}" target="_blank" rel="noopener noreferrer" th:text="${link.getLink()}"/> </td>
     </tr>
     </tbody>
 </table>
-
-<div th:replace="pagination"/>
 
 <div th:replace="footer"/>
