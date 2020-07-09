@@ -48,8 +48,8 @@ public class Link {
     }
 
     public void setLink(String link) {
-        if(link != null && link.length() > 100) {
-            throw new IllegalArgumentException("Lunghezza link deve essere < 100.");
+        if(link != null && link.length() > 200) {
+            throw new IllegalArgumentException("Lunghezza link deve essere < 200.");
         }
         this.link = link;
     }

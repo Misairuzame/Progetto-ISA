@@ -14,7 +14,7 @@ public class StringGenerator extends Generator<String> {
     public String generate(SourceOfRandomness sor, GenerationStatus gs) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < 30; i++) {
+        for (int i = 0; i < 50; i++) {
             sb.append(sor.nextChar('A', 'z'));
         }
 

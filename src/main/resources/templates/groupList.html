@@ -6,12 +6,16 @@
     <tr>
         <th>ID</th>
         <th>Name</th>
+        <th>View Music</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="group: ${groupList}">
         <td th:text="${group.getGroupId()}"/>
         <td th:text="${group.getName()}"/>
+        <td>
+            <a th:href="'/music?groupid='+${group.getGroupId()}">Vedi</a>
+        </td>
     </tr>
     </tbody>
 </table>

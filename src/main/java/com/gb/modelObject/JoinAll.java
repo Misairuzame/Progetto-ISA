@@ -73,15 +73,15 @@ public class JoinAll {
     }
 
     public void setMusicTitle(String musicTitle) {
-        if(musicTitle.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 30.");
+        if(musicTitle.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 100.");
         }
         this.musicTitle = musicTitle;
     }
 
     public void setGroupName(String groupName) {
-        if(groupName.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome gruppo deve essere < 30.");
+        if(groupName.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome gruppo deve essere < 100.");
         }
         this.groupName = groupName;
     }
@@ -94,8 +94,8 @@ public class JoinAll {
     }
 
     public void setAlbumTitle(String albumTitle) {
-        if(albumTitle != null && albumTitle.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 30.");
+        if(albumTitle != null && albumTitle.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 100.");
         }
         this.albumTitle = albumTitle;
     }
@@ -108,8 +108,8 @@ public class JoinAll {
     }
 
     public void setGenreName(String genreName) {
-        if(genreName.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 30.");
+        if(genreName.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 100.");
         }
         this.genreName = genreName;
     }

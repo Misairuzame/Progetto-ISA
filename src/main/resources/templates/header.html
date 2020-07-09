@@ -6,6 +6,11 @@
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+    <script>
+        function goBack() {
+            window.history.back();
+        }
+    </script>
     <!-- CSS "globale" -->
     <style>
         nav li>a {
@@ -37,10 +42,10 @@
                         Music
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownMusic">
-                        <a class="dropdown-item" href="/music">Lista Musiche</a>
-                        <a class="dropdown-item" href="/insmusic">Inserisci Musica</a>
-                        <a class="dropdown-item" href="/upmusic">Modifica Musica</a>
-                        <a class="dropdown-item" href="/delmusic">Elimina Musica</a>
+                        <a class="dropdown-item" href="/music" id="getMusicButton">Lista Musiche</a>
+                        <a class="dropdown-item" href="/insmusic" id="insMusicButton">Inserisci Musica</a>
+                        <a class="dropdown-item" href="/upmusic" id="upMusicButton">Modifica Musica</a>
+                        <a class="dropdown-item" href="/delmusic" id="delMusicButton">Elimina Musica</a>
                     </div>
                 </li>
 
@@ -50,9 +55,9 @@
                         Album
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownAlbum">
-                        <a class="dropdown-item" href="/album">Lista Album</a>
-                        <a class="dropdown-item" href="/insalbum">Inserisci Album</a>
-                        <a class="dropdown-item" href="/delalbum">Elimina Album</a>
+                        <a class="dropdown-item" href="/album" id="getAlbumButton">Lista Album</a>
+                        <a class="dropdown-item" href="/insalbum" id="insAlbumButton">Inserisci Album</a>
+                        <a class="dropdown-item" href="/delalbum" id="delAlbumButton">Elimina Album</a>
                     </div>
                 </li>
 
@@ -62,9 +67,9 @@
                         Artist
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownArtist">
-                        <a class="dropdown-item" href="/artist">Lista Artisti</a>
-                        <a class="dropdown-item" href="/insartist">Inserisci Artista</a>
-                        <a class="dropdown-item" href="/upartist">Modifica Artista</a>
+                        <a class="dropdown-item" href="/artist" id="getArtistButton">Lista Artisti</a>
+                        <a class="dropdown-item" href="/insartist" id="insArtistButton">Inserisci Artista</a>
+                        <a class="dropdown-item" href="/upartist" id="upArtistButton">Modifica Artista</a>
                     </div>
                 </li>
 
@@ -74,8 +79,8 @@
                         Group
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownGroup">
-                        <a class="dropdown-item" href="/group">Lista Gruppi</a>
-                        <a class="dropdown-item" href="/insgroup">Inserisci Gruppo</a>
+                        <a class="dropdown-item" href="/group" id="getGroupButton">Lista Gruppi</a>
+                        <a class="dropdown-item" href="/insgroup" id="insGroupButton">Inserisci Gruppo</a>
                     </div>
                 </li>
 
@@ -85,8 +90,8 @@
                         Genre
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownGenre">
-                        <a class="dropdown-item" href="/genre">Lista Generi</a>
-                        <a class="dropdown-item" href="/insgenre">Inserisci Genere</a>
+                        <a class="dropdown-item" href="/genre" id="getGenreButton">Lista Generi</a>
+                        <a class="dropdown-item" href="/insgenre" id="insGenreButton">Inserisci Genere</a>
                     </div>
                 </li>
 
@@ -96,8 +101,8 @@
                         Link
                     </a>
                     <div class="dropdown-menu" aria-labelledby="dropdownLink">
-                        <a class="dropdown-item" href="/link">Lista Link</a>
-                        <a class="dropdown-item" href="/inslink">Inserisci Link</a>
+                        <a class="dropdown-item" href="/link" id="getLinkButton">Lista Link</a>
+                        <a class="dropdown-item" href="/inslink" id="insLinkButton">Inserisci Link</a>
                     </div>
                 </li>
 
@@ -117,8 +122,8 @@
         </div>
         <!-- SEZIONE PER LA RICERCA -->
         <form class="form-inline my-2 my-lg-0" action="search" method="get">
-            <input class="form-control mr-sm-2" type="search" placeholder="Cerca..." aria-label="Cerca..." name="string">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">
+            <input class="form-control mr-sm-2" type="search" placeholder="Cerca..." aria-label="Cerca..." id="searchFormText" name="string">
+            <button class="btn btn-outline-success my-2 my-md-0" type="submit" id="searchButton">
                 <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-search" fill="currentColor"
                      xmlns="http://www.w3.org/2000/svg">
                     <path fill-rule="evenodd"

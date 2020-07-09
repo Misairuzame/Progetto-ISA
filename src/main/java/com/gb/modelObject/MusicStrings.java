@@ -59,8 +59,8 @@ public class MusicStrings {
     }
 
     public void setTitle(String title) {
-        if(title.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 30.");
+        if(title.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 100.");
         }
         this.title = title;
     }
@@ -70,8 +70,8 @@ public class MusicStrings {
     }
 
     public void setAuthor(String author) {
-        if(author.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome autore (gruppo) deve essere < 30.");
+        if(author.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome autore (gruppo) deve essere < 100.");
         }
         this.author = author;
     }
@@ -81,8 +81,8 @@ public class MusicStrings {
     }
 
     public void setAlbum(String album) {
-        if(album != null && album.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 30.");
+        if(album != null && album.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza titolo album deve essere < 100.");
         }
         this.album = album;
     }
@@ -92,8 +92,8 @@ public class MusicStrings {
     }
 
     public void setArtist(String artist) {
-        if(artist.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome artista album deve essere < 30.");
+        if(artist.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome artista album deve essere < 100.");
         }
         this.artist = artist;
     }
@@ -114,8 +114,8 @@ public class MusicStrings {
     }
 
     public void setGenre(String genre) {
-        if(genre.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 30.");
+        if(genre.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 100.");
         }
         this.genre = genre;
     }

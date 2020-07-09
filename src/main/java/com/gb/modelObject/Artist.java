@@ -51,8 +51,8 @@ public class Artist {
     }
 
     public void setName(String name) {
-        if(name.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome artista deve essere < 30.");
+        if(name.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome artista deve essere < 100.");
         }
         this.name = name;
     }

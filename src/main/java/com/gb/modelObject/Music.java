@@ -63,8 +63,8 @@ public class Music {
     }
 
     public void setTitle(String title) {
-        if(title.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 30.");
+        if(title.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza titolo musica deve essere < 100.");
         }
         this.title = title;
     }

@@ -243,12 +243,43 @@ public class Main {
      */
 
     private static String dispatchForms(Request req, Response res) {
-        Map<String, String> emptyModel = new HashMap<>();
+        Map<String, Object> model = new HashMap<>();
         String viewName = req.params("form");
         File testFile = new File(USER_DIR + "\\src\\main\\resources\\templates\\" + viewName + ".html");
-        if (testFile.exists()) {
-            return engine.render(new ModelAndView(emptyModel, viewName));
-        } else return handleNotFound(req, res);
+        if (!testFile.exists()) {
+            return handleNotFound(req, res);
+        }
+
+        if (viewName.equalsIgnoreCase("upmusic")) {
+            if (req.queryParams("musicToEdit") != null && !req.queryParams("musicToEdit").equals("") &&
+                    isNonNegativeInteger(req.queryParams("musicToEdit"))) {
+                int musicToEdit = Integer.parseInt(req.queryParams("musicToEdit"));
+                Database db = Database.getDatabase();
+                if (db == null) {
+                    return handleInternalError(req, res);
+                }
+                Music toEdit = db.getMusicById(musicToEdit).get(0);
+                model.put("musicToEdit", toEdit);
+            }
+        }
+
+        if (viewName.equalsIgnoreCase("delmusic")) {
+            if (req.queryParams("musicToDel") != null && !req.queryParams("musicToDel").equals("") &&
+                    isNonNegativeInteger(req.queryParams("musicToDel"))) {
+                int musicToDel = Integer.parseInt(req.queryParams("musicToDel"));
+                model.put("musicToDel", musicToDel);
+            }
+        }
+
+        if (viewName.equalsIgnoreCase("delalbum")) {
+            if (req.queryParams("albumToDel") != null && !req.queryParams("albumToDel").equals("") &&
+                    isNonNegativeInteger(req.queryParams("albumToDel"))) {
+                int albumToDel = Integer.parseInt(req.queryParams("albumToDel"));
+                model.put("albumToDel", albumToDel);
+            }
+        }
+
+        return engine.render(new ModelAndView(model, viewName));
     }
 
 
@@ -262,16 +293,56 @@ public class Main {
             return handleInternalError(req, res);
         }
 
+        Map<String, Object> model = new HashMap<>();
+
+        List<Music> musicList;
         int pageNum = 0;
-        if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+        if (req.queryParams("page") != null) {
+            if (!isNonNegativeInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
             }
         }
 
-        List<Music> musicList = db.getAllMusic(pageNum);
+        //Ricerca tramite album
+        if(req.queryParams("albumid") != null) {
+            if(!isNonNegativeInteger(req.queryParams("albumid"))) {
+                return handleParseError(req, res);
+            } else {
+                int albumId = Integer.parseInt(req.queryParams("albumid"));
+                musicList = db.getMusicByAlbum(albumId, pageNum);
+                String albumName = db.getAlbumById(albumId).get(0).getTitle();
+                model.put("albumName", albumName);
+            }
+        }
+        //Ricerca tramite genere
+        else if(req.queryParams("genreid") != null) {
+            if (!isNonNegativeInteger(req.queryParams("genreid"))) {
+                return handleParseError(req, res);
+            } else {
+                int genreId = Integer.parseInt(req.queryParams("genreid"));
+                musicList = db.getMusicByGenre(genreId, pageNum);
+                String genreName = db.getGenreById(genreId).get(0).getName();
+                model.put("genreName", genreName);
+            }
+        }
+        //Ricerca tramite gruppo
+        else if(req.queryParams("groupid") != null) {
+            if (!isNonNegativeInteger(req.queryParams("groupid"))) {
+                return handleParseError(req, res);
+            } else {
+                int groupId = Integer.parseInt(req.queryParams("groupid"));
+                musicList = db.getMusicByGroup(groupId, pageNum);
+                String groupName = db.getGroupById(groupId).get(0).getName();
+                model.put("groupName", groupName);
+            }
+        }
+        //Default
+        else {
+            musicList = db.getAllMusic(pageNum);
+        }
+
         if (musicList == null) {
             return handleInternalError(req, res);
         }
@@ -283,7 +354,6 @@ public class Main {
 
         info(musicList.toString());
 
-        Map<String, Object> model = new HashMap<>();
         model.put("musicList", musicList);
         model.put("page", pageNum);
         return engine.render(new ModelAndView(model, "musicList"));

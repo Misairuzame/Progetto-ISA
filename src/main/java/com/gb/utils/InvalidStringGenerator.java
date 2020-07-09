@@ -14,7 +14,7 @@ public class InvalidStringGenerator extends Generator<String> {
     public String generate(SourceOfRandomness sor, GenerationStatus gs) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < 51; i++) {
+        for (int i = 0; i < 150; i++) {
             sb.append(sor.nextChar('A', 'z'));
         }
 

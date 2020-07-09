@@ -8,6 +8,7 @@ import com.gb.modelObject.Music;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Random;
 
@@ -37,46 +38,65 @@ class DatabaseAndModelTest {
         final int musicId = Integer.MAX_VALUE;
         Random rand = new Random();
 
-        List<Album> albumList = database.getAllAlbums(0);
-        List<Group> groupList = database.getAllGroups(0);
-        List<Genre> genreList = database.getAllGenres(0);
+        try {
+            Database.getConnection().setAutoCommit(false);
 
-        assertNotNull(albumList);
-        assertNotNull(groupList);
-        assertNotNull(genreList);
+            List<Album> albumList = database.getAllAlbums(0);
+            List<Group> groupList = database.getAllGroups(0);
+            List<Genre> genreList = database.getAllGenres(0);
 
-        Music music = new Music(musicId,
-                "temporaryTestMusic",
-                groupList.get(rand.nextInt(groupList.size())).getGroupId(),
-                albumList.get(rand.nextInt(albumList.size())).getAlbumId(),
-                2020,
-                genreList.get(rand.nextInt(genreList.size())).getGenreId());
+            assertNotNull(albumList);
+            assertNotNull(groupList);
+            assertNotNull(genreList);
 
-        int result = database.insertMusic(music);
+            Music music = new Music(musicId,
+                    "temporaryTestMusic",
+                    groupList.get(rand.nextInt(groupList.size())).getGroupId(),
+                    albumList.get(rand.nextInt(albumList.size())).getAlbumId(),
+                    2020,
+                    genreList.get(rand.nextInt(genreList.size())).getGenreId());
 
-        assertTrue(result >= 0,
-                "Errore durante l'inserimento di una canzone.");
+            int result = database.insertMusic(music);
 
-        music.setTitle("temporaryTestMusic2");
-        music.setAuthorId(groupList.get(rand.nextInt(groupList.size())).getGroupId());
-        music.setAlbumId(albumList.get(rand.nextInt(albumList.size())).getAlbumId());
-        music.setYear(2021);
-        music.setGenreId(genreList.get(rand.nextInt(genreList.size())).getGenreId());
+            assertTrue(result >= 0,
+                    "Errore durante l'inserimento di una canzone.");
 
-        result = database.updateMusic(music);
+            music.setTitle("temporaryTestMusic2");
+            music.setAuthorId(groupList.get(rand.nextInt(groupList.size())).getGroupId());
+            music.setAlbumId(albumList.get(rand.nextInt(albumList.size())).getAlbumId());
+            music.setYear(2021);
+            music.setGenreId(genreList.get(rand.nextInt(genreList.size())).getGenreId());
 
-        assertTrue(result >= 0,
-                "Errore durante la modifica di una canzone.");
+            result = database.updateMusic(music);
 
-        result = database.deleteMusic(musicId);
+            assertTrue(result >= 0,
+                    "Errore durante la modifica di una canzone.");
 
-        assertTrue(result >= 0,
-                "Errore durante l'eliminazione di una canzone.");
+            result = database.deleteMusic(musicId);
 
-        List<Music> shouldBeEmpty = database.getMusicById(musicId);
+            assertTrue(result >= 0,
+                    "Errore durante l'eliminazione di una canzone.");
 
-        assertTrue(shouldBeEmpty.isEmpty(),
-                "E' stata trovata una canzone nonostante la si sia appena eliminata.");
+            List<Music> shouldBeEmpty = database.getMusicById(musicId);
+
+            assertTrue(shouldBeEmpty.isEmpty(),
+                    "E' stata trovata una canzone nonostante la si sia appena eliminata.");
+
+            Database.getConnection().commit();
+        } catch (SQLException e) {
+            fail("Ci sono stati errori in DatabaseFlow.");
+            try {
+                Database.getConnection().rollback();
+            } catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+        } finally {
+            try {
+                Database.getConnection().setAutoCommit(true);
+            } catch (SQLException ey) {
+                System.out.println(ey.getMessage());
+            }
+        }
     }
 
 }

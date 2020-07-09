@@ -21,9 +21,9 @@ dependencies {
     implementation group: 'com.google.guava', name: 'guava-io', version: 'r03'
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.7.0-M1'
     testImplementation group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.7.0-M1'
-    //testImplementation 'org.mockito:mockito-all:1.10.19'
     implementation 'com.pholser:junit-quickcheck-core:0.9.2'
     implementation 'com.pholser:junit-quickcheck-generators:0.9.2'
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '2.41.0'
 }
 
 task fatJar(type: Jar) {

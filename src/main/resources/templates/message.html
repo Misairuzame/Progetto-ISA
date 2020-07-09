@@ -2,4 +2,8 @@
 
 <h1 class="display-4" th:classappend="${messagetype}" th:text="${messagetext}"/>
 
+<button onclick="goBack()" class="btn btn-primary mb-2 mt-auto" style="position: absolute; bottom: 50%; left: 48%;">
+    Indietro
+</button>
+
 <div th:replace="footer"/>

@@ -25,4 +25,10 @@ public interface MusicDAO {
 
     List<MusicStrings> searchMusic(String searchTerm, int page);
 
+    List<Music> getMusicByAlbum(int albumId, int page);
+
+    List<Music> getMusicByGenre(int genreId, int page);
+
+    List<Music> getMusicByGroup(int groupId, int page);
+
 }

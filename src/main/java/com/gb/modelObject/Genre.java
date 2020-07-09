@@ -48,8 +48,8 @@ public class Genre {
     }
 
     public void setName(String name) {
-        if(name.length() > 30) {
-            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 30.");
+        if(name.length() > 100) {
+            throw new IllegalArgumentException("Lunghezza nome genere deve essere < 100.");
         }
         this.name = name;
     }

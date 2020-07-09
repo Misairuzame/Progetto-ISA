@@ -180,10 +180,14 @@ public class PostgreSQLImpl extends com.gb.db.Database {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, music.getTitle());
             ps.setInt(2, music.getAuthorId());
-            ps.setInt(3, music.getAlbumId());
+            if (music.getAlbumId() == null) {
+                ps.setNull(3, Types.INTEGER);
+            } else {
+                ps.setInt(3, music.getAlbumId());
+            }
             ps.setInt(4, music.getYear());
             ps.setInt(5, music.getGenreId());
-            ps.setLong(6, music.getMusicId());
+            ps.setInt(6, music.getMusicId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -890,7 +894,7 @@ public class PostgreSQLImpl extends com.gb.db.Database {
 
         String sql =
                 " SELECT M."+MUSICID+", M."+TITLE+", M."+AUTHORID+", M."+ALBUMID+", M."+YEAR+", M."+GENREID+", L."+LINK+
-                " FROM "+MUSIC_TABLE+" as M LEFT JOIN "+LINK+" as L" +
+                " FROM "+MUSIC_TABLE+" as M INNER JOIN "+LINK+" as L" +
                 " ON M."+MUSICID+" = L."+MUSICID+
                 " LIMIT ? OFFSET ? ";
 
@@ -927,6 +931,84 @@ public class PostgreSQLImpl extends com.gb.db.Database {
         }
 
         return 0;
+    }
+
+    @Override
+    public List<Music> getMusicByAlbum(int albumId, int page) {
+        List<Music> musicList = new ArrayList<>();
+
+        String sql =
+                " SELECT * " +
+                " FROM "  + MUSIC_TABLE +
+                " WHERE " + ALBUMID + " = ? " +
+                " LIMIT ? OFFSET ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, albumId);
+            ps.setInt(2, PAGE_SIZE);
+            ps.setInt(3, page*PAGE_SIZE);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    musicList.add(new Music(rs));
+                }
+            }
+            return musicList;
+        } catch (SQLException e) {
+            logger.error("Error in getMusicByAlbum: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Music> getMusicByGenre(int genreId, int page) {
+        List<Music> musicList = new ArrayList<>();
+
+        String sql =
+                " SELECT * " +
+                " FROM "  + MUSIC_TABLE +
+                " WHERE " + GENREID + " = ? " +
+                " LIMIT ? OFFSET ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, genreId);
+            ps.setInt(2, PAGE_SIZE);
+            ps.setInt(3, page*PAGE_SIZE);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    musicList.add(new Music(rs));
+                }
+            }
+            return musicList;
+        } catch (SQLException e) {
+            logger.error("Error in getMusicByGenre: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Music> getMusicByGroup(int groupId, int page) {
+        List<Music> musicList = new ArrayList<>();
+
+        String sql =
+                " SELECT * " +
+                " FROM "  + MUSIC_TABLE +
+                " WHERE " + AUTHORID + " = ? " +
+                " LIMIT ? OFFSET ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, groupId);
+            ps.setInt(2, PAGE_SIZE);
+            ps.setInt(3, page*PAGE_SIZE);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    musicList.add(new Music(rs));
+                }
+            }
+            return musicList;
+        } catch (SQLException e) {
+            logger.error("Error in getMusicByGroup: {}", e.getMessage());
+            return null;
+        }
     }
 
 }
