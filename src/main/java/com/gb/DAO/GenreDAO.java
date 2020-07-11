@@ -13,6 +13,10 @@ public interface GenreDAO {
 
     int insertGenre(Genre genre);
 
+    int updateGenre(Genre genre);
+
+    int deleteGenre(int genreId);
+
     Map<Integer, String> getGenreMap();
 
 }

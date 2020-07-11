@@ -26,10 +26,10 @@ public class Music {
             setMusicId(rs.getInt(MUSICID));
             setTitle(rs.getString(TITLE));
             setAuthorId(rs.getInt(AUTHORID));
-            if(rs.getString(ALBUMID) == null) {
-                setAlbumId(null);
-            } else {
+            if(rs.getString(ALBUMID) != null) {
                 setAlbumId(rs.getInt(ALBUMID));
+            } else {
+                setAlbumId(null);
             }
             setYear(rs.getInt(YEAR));
             setGenreId(rs.getInt(GENREID));

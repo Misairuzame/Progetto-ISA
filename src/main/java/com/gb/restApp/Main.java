@@ -194,6 +194,8 @@ public class Main {
         String userMethod = req.queryParamOrDefault("method", "GET");
         if(userMethod.equalsIgnoreCase(GET))    return getGroups(req, res);
         if(userMethod.equalsIgnoreCase(POST))   return insertGroup(req, res);
+        if(userMethod.equalsIgnoreCase(PUT))    return updateGroup(req, res);
+        if(userMethod.equalsIgnoreCase(DELETE)) return deleteGroup(req, res);
 
         return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                 "Metodo HTTP non supportato.");
@@ -203,6 +205,8 @@ public class Main {
         String userMethod = req.queryParamOrDefault("method", "GET");
         if(userMethod.equalsIgnoreCase(GET))    return getGenres(req, res);
         if(userMethod.equalsIgnoreCase(POST))   return insertGenre(req, res);
+        if(userMethod.equalsIgnoreCase(PUT))    return updateGenre(req, res);
+        if(userMethod.equalsIgnoreCase(DELETE)) return deleteGenre(req, res);
 
         return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                 "Metodo HTTP non supportato.");
@@ -224,6 +228,7 @@ public class Main {
         if(userMethod.equalsIgnoreCase(GET))    return getArtists(req, res);
         if(userMethod.equalsIgnoreCase(POST))   return insertArtist(req, res);
         if(userMethod.equalsIgnoreCase(PUT))    return updateArtist(req, res);
+        if(userMethod.equalsIgnoreCase(DELETE)) return deleteArtist(req, res);
 
         return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                 "Metodo HTTP non supportato.");
@@ -332,6 +337,20 @@ public class Main {
                 int albumToDel = Integer.parseInt(req.queryParams("albumToDel"));
                 model.put("albumToDel", albumToDel);
             }
+        } else
+        if (viewName.equalsIgnoreCase("delgroup")) {
+            if (req.queryParams("groupToDel") != null && !req.queryParams("groupToDel").equals("") &&
+                    isPositiveInteger(req.queryParams("groupToDel"))) {
+                int groupToDel = Integer.parseInt(req.queryParams("groupToDel"));
+                model.put("groupToDel", groupToDel);
+            }
+        } else
+        if (viewName.equalsIgnoreCase("delgenre")) {
+            if (req.queryParams("genreToDel") != null && !req.queryParams("genreToDel").equals("") &&
+                    isPositiveInteger(req.queryParams("genreToDel"))) {
+                int genreToDel = Integer.parseInt(req.queryParams("genreToDel"));
+                model.put("genreToDel", genreToDel);
+            }
         }
 
         return engine.render(new ModelAndView(model, viewName));
@@ -353,7 +372,7 @@ public class Main {
         List<Music> musicList;
         int pageNum = 0;
         if (req.queryParams("page") != null) {
-            if (!isPositiveInteger(req.queryParams("page"))) {
+            if (!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -394,6 +413,18 @@ public class Main {
                 String groupName = db.getGroupById(groupId).get(0).getName();
                 model.put("groupId", groupId);
                 model.put("groupName", groupName);
+            }
+        }
+        //Ricerca tramite artista
+        else if(req.queryParams("artistid") != null) {
+            if (!isPositiveInteger(req.queryParams("artistid"))) {
+                return handleParseError(req, res);
+            } else {
+                int artistId = Integer.parseInt(req.queryParams("artistid"));
+                musicList = db.getMusicByArtist(artistId, pageNum);
+                String artistName = db.getArtistById(artistId).get(0).getName();
+                model.put("artistId", artistId);
+                model.put("artistName", artistName);
             }
         }
         //Default
@@ -563,7 +594,7 @@ public class Main {
         }
 
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -602,7 +633,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -729,7 +760,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -817,6 +848,35 @@ public class Main {
                 "Artista con id "+ artistToAdd.getArtistId()+" aggiunto con successo.");
     }
 
+    private static String deleteArtist(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        if(req.queryParams(ARTISTID) == null || !isPositiveInteger(req.queryParams(ARTISTID))) {
+            return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
+                    "Specificare un id nel formato corretto.");
+        }
+
+        int artistId = Integer.parseInt(req.queryParams(ARTISTID));
+        int result = db.deleteArtist(artistId);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+            if(result == -1) {
+                return returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                        "Non esiste un artista con id "+ artistId +", " +
+                                "impossibile eliminarlo.");
+            }
+        }
+
+        return returnMessage(req, res, SC_OK, "text-success",
+                "Artista con id "+ artistId +" eliminato con successo.");
+
+    }
+
     private static String getGroups(Request req, Response res) {
         Database db = Database.getDatabase();
         if (db == null) {
@@ -825,7 +885,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -880,6 +940,66 @@ public class Main {
                 "Gruppo con id "+groupToAdd.getGroupId()+" aggiunto con successo.");
     }
 
+    private static String updateGroup(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        Group groupToEdit = new Group();
+        try {
+            groupToEdit.setGroupId(Integer.parseInt(req.queryParams(GROUPID)));
+            groupToEdit.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            logger.warn("Errore nella deserializzazione del gruppo da modificare");
+            return handleParseError(req, res);
+        }
+
+        int result = db.updateGroup(groupToEdit);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+            if(result == -1) {
+                return returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                        "Non esiste un gruppo con id "+ groupToEdit.getGroupId()+", " +
+                                "impossibile aggiornarlo.");
+            }
+        }
+
+        return returnMessage(req, res, SC_CREATED, "text-success",
+                "Gruppo con id "+ groupToEdit.getGroupId()+" aggiunto con successo.");
+    }
+
+    private static String deleteGroup(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        if(req.queryParams(GROUPID) == null || !isPositiveInteger(req.queryParams(GROUPID))) {
+            return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
+                    "Specificare un id nel formato corretto.");
+        }
+
+        int groupId = Integer.parseInt(req.queryParams(GROUPID));
+        int result = db.deleteGroup(groupId);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+            if(result == -1) {
+                return returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                        "Non esiste un gruppo con id "+ groupId +", " +
+                                "impossibile eliminarlo.");
+            }
+        }
+
+        return returnMessage(req, res, SC_OK, "text-success",
+                "Gruppo con id "+ groupId +" eliminato con successo.");
+
+    }
+
     private static String getGenres(Request req, Response res) {
         Database db = Database.getDatabase();
         if (db == null) {
@@ -888,7 +1008,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -943,6 +1063,66 @@ public class Main {
                 "Genere con id "+ genreToAdd.getGenreId()+" aggiunto con successo.");
     }
 
+    private static String updateGenre(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        Genre genreToEdit = new Genre();
+        try {
+            genreToEdit.setGenreId(Integer.parseInt(req.queryParams(GENREID)));
+            genreToEdit.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            logger.warn("Errore nella deserializzazione del genere da modificare");
+            return handleParseError(req, res);
+        }
+
+        int result = db.insertGenre(genreToEdit);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+            if(result == -1) {
+                return returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                        "Non esiste un genere con id "+ genreToEdit.getGenreId()+", " +
+                                "impossibile aggiornarlo.");
+            }
+        }
+
+        return returnMessage(req, res, SC_CREATED, "text-success",
+                "Genere con id "+ genreToEdit.getGenreId()+" modificato con successo.");
+    }
+
+    private static String deleteGenre(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        if(req.queryParams(GENREID) == null || !isPositiveInteger(req.queryParams(GENREID))) {
+            return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
+                    "Specificare un id nel formato corretto.");
+        }
+
+        int genreId = Integer.parseInt(req.queryParams(GENREID));
+        int result = db.deleteGenre(genreId);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+            if(result == -1) {
+                return returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                        "Non esiste un genere con id "+ genreId +", " +
+                                "impossibile eliminarlo.");
+            }
+        }
+
+        return returnMessage(req, res, SC_OK, "text-success",
+                "Genere con id "+ genreId +" eliminato con successo.");
+
+    }
+
     private static String getLinks(Request req, Response res) {
         Database db = Database.getDatabase();
         if (db == null) {
@@ -951,7 +1131,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -1010,7 +1190,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -1043,7 +1223,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -1076,7 +1256,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isPositiveInteger(req.queryParams("page"))) {
+            if(!isGeThanZero(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));

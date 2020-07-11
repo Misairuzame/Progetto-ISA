@@ -13,6 +13,10 @@ public interface GroupDAO {
 
     int insertGroup(Group group);
 
+    int updateGroup(Group group);
+
+    int deleteGroup(int groupId);
+
     Map<Integer, String> getGroupMap();
 
 }

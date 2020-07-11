@@ -15,6 +15,8 @@ public interface ArtistDAO {
 
     int insertArtist(Artist artist);
 
+    int deleteArtist(int artistId);
+
     List<Artist> getArtistById(int artistId);
 
 }

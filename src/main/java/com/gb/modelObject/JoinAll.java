@@ -115,8 +115,8 @@ public class JoinAll {
     }
 
     public void setNumLinks(int numLinks) {
-        if(numLinks <= 0) {
-            throw new IllegalArgumentException("Numero di link deve essere > 0.");
+        if(numLinks < 0) {
+            throw new IllegalArgumentException("Numero di link deve essere >= 0.");
         }
         this.numLinks = numLinks;
     }

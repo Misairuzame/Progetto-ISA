@@ -31,4 +31,6 @@ public interface MusicDAO {
 
     List<Music> getMusicByGroup(int groupId, int page);
 
+    List<Music> getMusicByArtist(int artistId, int page);
+
 }

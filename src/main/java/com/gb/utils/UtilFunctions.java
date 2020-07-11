@@ -15,4 +15,13 @@ public class UtilFunctions {
         }
     }
 
+    public static boolean isGeThanZero(String num) {
+        try {
+            int integer = Integer.parseInt(num);
+            return integer >= 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
 }

@@ -457,7 +457,7 @@ public class PostgreSQLImpl extends com.gb.db.Database {
                     exists = rs.getInt(1) > 0;
                 }
                 if (!exists) {
-                    logger.warn("L'album con id {} non esiste, impossibile eliminarla.", albumId);
+                    logger.warn("L'album con id {} non esiste, impossibile eliminarlo.", albumId);
                     return -1;
                 }
             }
@@ -709,6 +709,46 @@ public class PostgreSQLImpl extends com.gb.db.Database {
     }
 
     @Override
+    public int deleteArtist(int artistId) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + ARTIST_TABLE +
+                " WHERE " + ARTISTID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, artistId);
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("L'artista con id {} non esiste, impossibile eliminarlo.", artistId);
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in deleteArtist: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " DELETE FROM " + ARTIST_TABLE +
+                " WHERE " + ARTISTID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, artistId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error in deleteArtist: {}", e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
     public List<Genre> getAllGenres(int page) {
         List<Genre> genreList = new ArrayList<>();
 
@@ -799,6 +839,89 @@ public class PostgreSQLImpl extends com.gb.db.Database {
     }
 
     @Override
+    public int updateGenre(Genre genre) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GENRE_TABLE +
+                " WHERE " + GENREID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, genre.getGenreId());
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il genere con id {} non esiste, impossibile aggiornarlo.", genre.getGenreId());
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in updateGenre: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " UPDATE " + GENRE_TABLE + " SET " +
+                 NAME + " = ? " +
+                 " WHERE " + GENREID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, genre.getName());
+            ps.setInt(2, genre.getGenreId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Exception in updateGenre: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int deleteGenre(int genreId) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GENRE_TABLE +
+                " WHERE " + GENREID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, genreId);
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il genere con id {} non esiste, impossibile eliminarlo.", genreId);
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in deleteGenre: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " DELETE FROM " + GENRE_TABLE +
+                " WHERE " + GENREID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, genreId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error in deleteGenre: {}", e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
     public List<Group> getAllGroups(int page) {
         List<Group> groupList = new ArrayList<>();
 
@@ -882,6 +1005,89 @@ public class PostgreSQLImpl extends com.gb.db.Database {
             ps.executeUpdate();
         } catch (SQLException e) {
             logger.error("Exception in insertGroup: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int updateGroup(Group group) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GROUP_TABLE +
+                " WHERE " + GROUPID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, group.getGroupId());
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il gruppo con id {} non esiste, impossibile aggiornarlo.", group.getGroupId());
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in updateGroup: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " UPDATE " + GROUP_TABLE + " SET " +
+                 NAME + " = ? " +
+                " WHERE " + GROUPID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, group.getName());
+            ps.setInt(2, group.getGroupId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Exception in updateGroup: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int deleteGroup(int groupId) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GROUP_TABLE +
+                " WHERE " + GROUPID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, groupId);
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il gruppo con id {} non esiste, impossibile eliminarlo.", groupId);
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in deleteGroup: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " DELETE FROM " + GROUP_TABLE +
+                " WHERE " + GROUPID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, groupId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error in deleteGroup: {}", e.getMessage());
             return -2;
         }
 
@@ -1054,6 +1260,34 @@ public class PostgreSQLImpl extends com.gb.db.Database {
             return musicList;
         } catch (SQLException e) {
             logger.error("Error in getMusicByGroup: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Music> getMusicByArtist(int artistId, int page) {
+        List<Music> musicList = new ArrayList<>();
+
+        String sql =
+                " SELECT M.musicid, M.title, A.artistid AS authorid, M.albumid, M.year, M.genreid " +
+                " FROM " + MUSIC_TABLE + " AS M, " + GROUP_TABLE + " AS G, " +
+                 ARTIST_TABLE + " AS A " +
+                " WHERE M.authorid = G.groupid AND G.groupid = A.groupid AND " +
+                " A.artistid = ? " +
+                " LIMIT ? OFFSET ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, artistId);
+            ps.setInt(2, PAGE_SIZE);
+            ps.setInt(3, page*PAGE_SIZE);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    musicList.add(new Music(rs));
+                }
+            }
+            return musicList;
+        } catch (SQLException e) {
+            logger.error("Error in getMusicByArtist: {}", e.getMessage());
             return null;
         }
     }
