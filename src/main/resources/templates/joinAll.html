@@ -17,10 +17,10 @@
     LEFT JOIN
     (
     &emsp; SELECT COUNT(Ar.artistid) AS numartisti, Gr.name AS groupname, Gr.groupid AS tmpgrid
-    &emsp; FROM grouptable AS Gr LEFT JOIN artist AS Ar ON (Ar.groupid = Gr.groupid
+    &emsp; FROM grouptable AS Gr LEFT JOIN artist AS Ar ON (Ar.groupid = Gr.groupid)
     &emsp; GROUP BY tmpgrid, groupname
-    ) as tmptable ON (M.authorid = tmpgrid
-    INNER JOIN genre AS Ge ON (M.genreid = Ge.genreid
+    ) as tmptable ON (M.authorid = tmpgrid)
+    INNER JOIN genre AS Ge ON (M.genreid = Ge.genreid)
     LEFT JOIN link AS L on (M.musicid = L.musicid)
     GROUP BY M.musicid, tmptable.groupname, Al.title, Ge.name, tmptable.numartisti;
     </code>

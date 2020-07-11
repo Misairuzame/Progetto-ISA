@@ -48,7 +48,7 @@ public class MusicStrings {
     }
 
     public void setMusicId(Integer musicId) {
-        if(musicId < 0) {
+        if(musicId <= 0) {
             throw new IllegalArgumentException("MusicId deve essere > 0.");
         }
         this.musicId = musicId;

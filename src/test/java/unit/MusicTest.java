@@ -21,7 +21,7 @@ public class MusicTest {
     }
 
     @Property(trials = 50)
-    public void setMusicId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setMusicId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Music().setMusicId(negativeId);
@@ -59,7 +59,7 @@ public class MusicTest {
     }
 
     @Property(trials = 50)
-    public void setAuthorId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setAuthorId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Music().setAuthorId(negativeId);
@@ -78,7 +78,7 @@ public class MusicTest {
     }
 
     @Property(trials = 50)
-    public void setAlbumId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setAlbumId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Music().setAlbumId(negativeId);
@@ -124,7 +124,7 @@ public class MusicTest {
     }
 
     @Property(trials = 50)
-    public void setGenreId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setGenreId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Music().setGenreId(negativeId);

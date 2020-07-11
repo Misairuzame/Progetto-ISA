@@ -37,7 +37,7 @@ public class Group {
     }
 
     public void setGroupId(Integer groupId) {
-        if(groupId < 0) {
+        if(groupId <= 0) {
             throw new IllegalArgumentException("GroupId deve essere > 0.");
         }
         this.groupId = groupId;

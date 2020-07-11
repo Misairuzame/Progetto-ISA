@@ -3,7 +3,6 @@ package com.gb.restApp;
 import static spark.Spark.*;
 
 import com.gb.db.Database;
-import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
 import com.gb.modelObject.*;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closeables;
@@ -170,6 +169,7 @@ public class Main {
      * Sezione per effettuare il dispatching delle richieste.
      * Necessario per gestire i metodi HTTP.
      */
+    //TODO: Refactor con switch statement
 
     private static String dispatchMusic(Request req, Response res) {
         String userMethod = req.queryParamOrDefault("method", "GET");
@@ -211,6 +211,7 @@ public class Main {
     private static String dispatchAlbum(Request req, Response res) {
         String userMethod = req.queryParamOrDefault("method", "GET");
         if(userMethod.equalsIgnoreCase(GET))    return getAlbums(req, res);
+        if(userMethod.equalsIgnoreCase(PUT))    return updateAlbum(req, res);
         if(userMethod.equalsIgnoreCase(POST))   return insertAlbum(req, res);
         if(userMethod.equalsIgnoreCase(DELETE)) return deleteAlbum(req, res);
 
@@ -243,6 +244,7 @@ public class Main {
      */
 
     private static String dispatchForms(Request req, Response res) {
+        //TODO: Refactor assolutamente
         Map<String, Object> model = new HashMap<>();
         String viewName = req.params("form");
         File testFile = new File(USER_DIR + "\\src\\main\\resources\\templates\\" + viewName + ".html");
@@ -252,7 +254,7 @@ public class Main {
 
         if (viewName.equalsIgnoreCase("upmusic")) {
             if (req.queryParams("musicToEdit") != null && !req.queryParams("musicToEdit").equals("") &&
-                    isNonNegativeInteger(req.queryParams("musicToEdit"))) {
+                    isPositiveInteger(req.queryParams("musicToEdit"))) {
                 int musicToEdit = Integer.parseInt(req.queryParams("musicToEdit"));
                 Database db = Database.getDatabase();
                 if (db == null) {
@@ -261,20 +263,72 @@ public class Main {
                 Music toEdit = db.getMusicById(musicToEdit).get(0);
                 model.put("musicToEdit", toEdit);
             }
+        }
+        if (viewName.equalsIgnoreCase("upmusic") || viewName.equalsIgnoreCase("insmusic")) {
+            Database db = Database.getDatabase();
+            if (db == null) {
+                return handleInternalError(req, res);
+            }
+            Map<Integer, String> groupMap = db.getGroupMap();
+            if(groupMap == null) {
+                return handleInternalError(req, res);
+            }
+
+            Map<Integer, String> albumMap = db.getAlbumMap();
+            if(albumMap == null) {
+                return handleInternalError(req, res);
+            }
+
+            Map<Integer, String> genreMap = db.getGenreMap();
+            if(genreMap == null) {
+                return handleInternalError(req, res);
+            }
+
+            model.put("authorMap", groupMap);
+            model.put("albumMap", albumMap);
+            model.put("genreMap", genreMap);
         } else
-        if (viewName.equalsIgnoreCase("insmusic")) {
-            //Map<Integer, String> authorMap =
+        if (viewName.equalsIgnoreCase("insalbum") || viewName.equalsIgnoreCase("upalbum") ||
+            viewName.equalsIgnoreCase("upartist") || viewName.equalsIgnoreCase("insartist")) {
+            Database db = Database.getDatabase();
+            if (db == null) {
+                return handleInternalError(req, res);
+            }
+            Map<Integer, String> groupMap = db.getGroupMap();
+            if(groupMap == null) {
+                return handleInternalError(req, res);
+            }
+
+            model.put("groupMap", groupMap);
+
+            if(viewName.equalsIgnoreCase("upartist")) {
+                if (req.queryParams("artistToEdit") != null && !req.queryParams("artistToEdit").equals("") &&
+                        isPositiveInteger(req.queryParams("artistToEdit"))) {
+                    int artistToEdit = Integer.parseInt(req.queryParams("artistToEdit"));
+                    Artist toEdit = db.getArtistById(artistToEdit).get(0);
+                    model.put("artistToEdit", toEdit);
+                }
+            }
+
+            if (viewName.equalsIgnoreCase("upalbum")) {
+                if (req.queryParams("albumToEdit") != null && !req.queryParams("albumToEdit").equals("") &&
+                        isPositiveInteger(req.queryParams("albumToEdit"))) {
+                    int albumToEdit = Integer.parseInt(req.queryParams("albumToEdit"));
+                    Album toEdit = db.getAlbumById(albumToEdit).get(0);
+                    model.put("albumToEdit", toEdit);
+                }
+            }
         } else
         if (viewName.equalsIgnoreCase("delmusic")) {
             if (req.queryParams("musicToDel") != null && !req.queryParams("musicToDel").equals("") &&
-                    isNonNegativeInteger(req.queryParams("musicToDel"))) {
+                    isPositiveInteger(req.queryParams("musicToDel"))) {
                 int musicToDel = Integer.parseInt(req.queryParams("musicToDel"));
                 model.put("musicToDel", musicToDel);
             }
         } else
         if (viewName.equalsIgnoreCase("delalbum")) {
             if (req.queryParams("albumToDel") != null && !req.queryParams("albumToDel").equals("") &&
-                    isNonNegativeInteger(req.queryParams("albumToDel"))) {
+                    isPositiveInteger(req.queryParams("albumToDel"))) {
                 int albumToDel = Integer.parseInt(req.queryParams("albumToDel"));
                 model.put("albumToDel", albumToDel);
             }
@@ -299,7 +353,7 @@ public class Main {
         List<Music> musicList;
         int pageNum = 0;
         if (req.queryParams("page") != null) {
-            if (!isNonNegativeInteger(req.queryParams("page"))) {
+            if (!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -308,7 +362,7 @@ public class Main {
 
         //Ricerca tramite album
         if(req.queryParams("albumid") != null) {
-            if(!isNonNegativeInteger(req.queryParams("albumid"))) {
+            if(!isPositiveInteger(req.queryParams("albumid"))) {
                 return handleParseError(req, res);
             } else {
                 int albumId = Integer.parseInt(req.queryParams("albumid"));
@@ -320,7 +374,7 @@ public class Main {
         }
         //Ricerca tramite genere
         else if(req.queryParams("genreid") != null) {
-            if (!isNonNegativeInteger(req.queryParams("genreid"))) {
+            if (!isPositiveInteger(req.queryParams("genreid"))) {
                 return handleParseError(req, res);
             } else {
                 int genreId = Integer.parseInt(req.queryParams("genreid"));
@@ -332,7 +386,7 @@ public class Main {
         }
         //Ricerca tramite gruppo
         else if(req.queryParams("groupid") != null) {
-            if (!isNonNegativeInteger(req.queryParams("groupid"))) {
+            if (!isPositiveInteger(req.queryParams("groupid"))) {
                 return handleParseError(req, res);
             } else {
                 int groupId = Integer.parseInt(req.queryParams("groupid"));
@@ -477,7 +531,7 @@ public class Main {
             return handleInternalError(req, res);
         }
 
-        if(req.queryParams(MUSICID) == null || !isNonNegativeInteger(req.queryParams(MUSICID))) {
+        if(req.queryParams(MUSICID) == null || !isPositiveInteger(req.queryParams(MUSICID))) {
             return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                     "Specificare un id nel formato corretto.");
         }
@@ -509,7 +563,7 @@ public class Main {
         }
 
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -548,7 +602,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -605,13 +659,46 @@ public class Main {
                 "Album con id "+albumToAdd.getAlbumId()+" aggiunto con successo.");
     }
 
+    private static String updateAlbum(Request req, Response res) {
+        Database db = Database.getDatabase();
+        if (db == null) {
+            return handleInternalError(req, res);
+        }
+
+        Album albumToUpdate = new Album();
+        try {
+            albumToUpdate.setAlbumId(Integer.parseInt(req.queryParams(ALBUMID)));
+            albumToUpdate.setTitle(URLDecoder.decode(req.queryParams(TITLE), "UTF-8"));
+            albumToUpdate.setYear(Integer.parseInt(req.queryParams(YEAR)));
+            albumToUpdate.setGroupId(Integer.parseInt(req.queryParams(GROUPID)));
+        } catch (UnsupportedEncodingException | IllegalArgumentException e) {
+            logger.warn("Errore nella deserializzazione dell' album da aggiornare");
+            return handleParseError(req, res);
+        }
+
+        int result = db.updateAlbum(albumToUpdate);
+        if(result < 0) {
+            if(result == -2) {
+                return handleInternalError(req, res);
+            }
+            if(result == -1) {
+                returnMessage(req, res, SC_BAD_REQUEST, "text-warning",
+                        "Non esiste un album con id "+albumToUpdate.getAlbumId()+", " +
+                                "impossibile aggiornarlo.");
+            }
+        }
+
+        return returnMessage(req, res, SC_CREATED, "text-success",
+                "Album con id "+ albumToUpdate.getAlbumId()+" modificato con successo.");
+    }
+
     private static String deleteAlbum(Request req, Response res) {
         Database db = Database.getDatabase();
         if (db == null) {
             return handleInternalError(req, res);
         }
 
-        if(req.queryParams(ALBUMID) == null || !isNonNegativeInteger(req.queryParams(ALBUMID))) {
+        if(req.queryParams(ALBUMID) == null || !isPositiveInteger(req.queryParams(ALBUMID))) {
             return returnMessage(req, res, SC_BAD_REQUEST, "text-danger",
                     "Specificare un id nel formato corretto.");
         }
@@ -642,7 +729,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -738,7 +825,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -801,7 +888,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -864,7 +951,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -923,7 +1010,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -956,7 +1043,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));
@@ -989,7 +1076,7 @@ public class Main {
 
         int pageNum = 0;
         if(req.queryParams("page") != null) {
-            if(!isNonNegativeInteger(req.queryParams("page"))) {
+            if(!isPositiveInteger(req.queryParams("page"))) {
                 return handleParseError(req, res);
             } else {
                 pageNum = Integer.parseInt(req.queryParams("page"));

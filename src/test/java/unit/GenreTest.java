@@ -21,7 +21,7 @@ public class GenreTest {
     }
 
     @Property(trials = 50)
-    public void setGenreId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setGenreId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Genre().setGenreId(negativeId);

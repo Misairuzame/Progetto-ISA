@@ -81,17 +81,11 @@ class DatabaseAndModelTest {
 
             assertTrue(shouldBeEmpty.isEmpty(),
                     "E' stata trovata una canzone nonostante la si sia appena eliminata.");
-
-            Database.getConnection().commit();
         } catch (SQLException e) {
             fail("Ci sono stati errori in DatabaseFlow.");
-            try {
-                Database.getConnection().rollback();
-            } catch (SQLException ex) {
-                System.out.println(ex.getMessage());
-            }
         } finally {
             try {
+                Database.getConnection().rollback();
                 Database.getConnection().setAutoCommit(true);
             } catch (SQLException ey) {
                 System.out.println(ey.getMessage());

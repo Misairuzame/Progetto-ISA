@@ -37,7 +37,7 @@ public class Genre {
     }
 
     public void setGenreId(Integer genreId) {
-        if(genreId < 0) {
+        if(genreId <= 0) {
             throw new IllegalArgumentException("GenreId deve essere > 0.");
         }
         this.genreId = genreId;

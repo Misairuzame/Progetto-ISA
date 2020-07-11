@@ -21,7 +21,7 @@ public class LinkTest {
     }
 
     @Property(trials = 50)
-    public void setMusicId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setMusicId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Link().setMusicId(negativeId);

@@ -23,7 +23,10 @@ facente parte di un gruppo che ha come nome il nome dell'artista.</p>
     </div>
     <div class="form-group text-light">
         <label for="groupid">GroupID</label>
-        <input type="text" class="form-control" id="groupid" placeholder="GroupID" name="groupid">
+        <input type="text" class="form-control" id="groupid" list="groupList" placeholder="GroupID" name="groupid">
+        <datalist id="groupList">
+            <option th:each="group: ${groupMap}" th:value="${group.getKey()}" th:text="${group.getValue()}"></option>
+        </datalist>
     </div>
     <button type="submit" class="btn btn-primary" style="margin: 0">Inserisci</button>
     <input type="hidden" name="method" value="POST">
