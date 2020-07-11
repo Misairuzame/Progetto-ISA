@@ -3,6 +3,7 @@ package com.gb.DAO;
 import com.gb.modelObject.Group;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GroupDAO {
 
@@ -11,5 +12,7 @@ public interface GroupDAO {
     List<Group> getGroupById(int groupId);
 
     int insertGroup(Group group);
+
+    Map<Integer, String> getGroupMap();
 
 }

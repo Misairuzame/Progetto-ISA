@@ -8,6 +8,7 @@ import com.gb.modelObject.Group;
 import com.gb.modelObject.Music;
 import com.gb.restApp.Main;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -32,6 +33,7 @@ public class SeleniumTest {
         assertNotNull(database);
     }
 
+    @Ignore
     @Test
     public void browserFlow() throws SQLException {
         System.setProperty("webdriver.chrome.driver", Constants.USER_DIR+"\\src\\test\\resources\\driver\\chromedriver.exe");
@@ -135,8 +137,8 @@ public class SeleniumTest {
             WebElement tbody = driver.findElement(By.tagName("tbody"));
             List<WebElement> td = tbody.findElement(By.tagName("tr")).findElements(By.tagName("td"));
             boolean found = false;
-            for (WebElement riga : td) {
-                if (riga.getText().equals("temporaryTestMusic")) {
+            for (WebElement campo : td) {
+                if (campo.getText().equals("temporaryTestMusic")) {
                     found = true;
                 }
             }

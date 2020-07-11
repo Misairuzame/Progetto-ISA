@@ -261,16 +261,17 @@ public class Main {
                 Music toEdit = db.getMusicById(musicToEdit).get(0);
                 model.put("musicToEdit", toEdit);
             }
-        }
-
+        } else
+        if (viewName.equalsIgnoreCase("insmusic")) {
+            //Map<Integer, String> authorMap =
+        } else
         if (viewName.equalsIgnoreCase("delmusic")) {
             if (req.queryParams("musicToDel") != null && !req.queryParams("musicToDel").equals("") &&
                     isNonNegativeInteger(req.queryParams("musicToDel"))) {
                 int musicToDel = Integer.parseInt(req.queryParams("musicToDel"));
                 model.put("musicToDel", musicToDel);
             }
-        }
-
+        } else
         if (viewName.equalsIgnoreCase("delalbum")) {
             if (req.queryParams("albumToDel") != null && !req.queryParams("albumToDel").equals("") &&
                     isNonNegativeInteger(req.queryParams("albumToDel"))) {
@@ -313,6 +314,7 @@ public class Main {
                 int albumId = Integer.parseInt(req.queryParams("albumid"));
                 musicList = db.getMusicByAlbum(albumId, pageNum);
                 String albumName = db.getAlbumById(albumId).get(0).getTitle();
+                model.put("albumId", albumId);
                 model.put("albumName", albumName);
             }
         }
@@ -324,6 +326,7 @@ public class Main {
                 int genreId = Integer.parseInt(req.queryParams("genreid"));
                 musicList = db.getMusicByGenre(genreId, pageNum);
                 String genreName = db.getGenreById(genreId).get(0).getName();
+                model.put("genreId", genreId);
                 model.put("genreName", genreName);
             }
         }
@@ -335,6 +338,7 @@ public class Main {
                 int groupId = Integer.parseInt(req.queryParams("groupid"));
                 musicList = db.getMusicByGroup(groupId, pageNum);
                 String groupName = db.getGroupById(groupId).get(0).getName();
+                model.put("groupId", groupId);
                 model.put("groupName", groupName);
             }
         }
