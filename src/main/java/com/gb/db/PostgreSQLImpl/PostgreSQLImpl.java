@@ -866,7 +866,7 @@ public class PostgreSQLImpl extends com.gb.db.Database {
         String sql =
                 " UPDATE " + GENRE_TABLE + " SET " +
                  NAME + " = ? " +
-                 " WHERE " + GENREID + " = ? ";
+                " WHERE " + GENREID + " = ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, genre.getName());

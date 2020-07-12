@@ -331,6 +331,13 @@ public class Main {
                 model.put("musicToDel", musicToDel);
             }
         } else
+        if (viewName.equalsIgnoreCase("delartist")) {
+            if (req.queryParams("artistToDel") != null && !req.queryParams("artistToDel").equals("") &&
+                    isPositiveInteger(req.queryParams("artistToDel"))) {
+                int artistToDel = Integer.parseInt(req.queryParams("artistToDel"));
+                model.put("artistToDel", artistToDel);
+            }
+        } else
         if (viewName.equalsIgnoreCase("delalbum")) {
             if (req.queryParams("albumToDel") != null && !req.queryParams("albumToDel").equals("") &&
                     isPositiveInteger(req.queryParams("albumToDel"))) {
@@ -350,6 +357,32 @@ public class Main {
                     isPositiveInteger(req.queryParams("genreToDel"))) {
                 int genreToDel = Integer.parseInt(req.queryParams("genreToDel"));
                 model.put("genreToDel", genreToDel);
+            }
+        } else
+        if (viewName.equalsIgnoreCase("upgroup")) {
+            if (req.queryParams("groupToEdit") != null && !req.queryParams("groupToEdit").equals("") &&
+                    isPositiveInteger(req.queryParams("groupToEdit"))) {
+                int groupToEdit = Integer.parseInt(req.queryParams("groupToEdit"));
+                Database db = Database.getDatabase();
+                if (db == null) {
+                    return handleInternalError(req, res);
+                }
+                Group toEdit = db.getGroupById(groupToEdit).get(0);
+
+                model.put("groupToEdit", toEdit);
+            }
+        } else
+        if (viewName.equalsIgnoreCase("upgenre")) {
+            if (req.queryParams("genreToEdit") != null && !req.queryParams("genreToEdit").equals("") &&
+                    isPositiveInteger(req.queryParams("genreToEdit"))) {
+                int genreToEdit = Integer.parseInt(req.queryParams("genreToEdit"));
+                Database db = Database.getDatabase();
+                if (db == null) {
+                    return handleInternalError(req, res);
+                }
+                Genre toEdit = db.getGenreById(genreToEdit).get(0);
+
+                model.put("genreToEdit", toEdit);
             }
         }
 
@@ -390,9 +423,9 @@ public class Main {
                 model.put("albumId", albumId);
                 model.put("albumName", albumName);
             }
-        }
+        } else
         //Ricerca tramite genere
-        else if(req.queryParams("genreid") != null) {
+         if(req.queryParams("genreid") != null) {
             if (!isPositiveInteger(req.queryParams("genreid"))) {
                 return handleParseError(req, res);
             } else {
@@ -402,9 +435,9 @@ public class Main {
                 model.put("genreId", genreId);
                 model.put("genreName", genreName);
             }
-        }
+        } else
         //Ricerca tramite gruppo
-        else if(req.queryParams("groupid") != null) {
+         if(req.queryParams("groupid") != null) {
             if (!isPositiveInteger(req.queryParams("groupid"))) {
                 return handleParseError(req, res);
             } else {
@@ -414,9 +447,9 @@ public class Main {
                 model.put("groupId", groupId);
                 model.put("groupName", groupName);
             }
-        }
+        } else
         //Ricerca tramite artista
-        else if(req.queryParams("artistid") != null) {
+         if(req.queryParams("artistid") != null) {
             if (!isPositiveInteger(req.queryParams("artistid"))) {
                 return handleParseError(req, res);
             } else {
@@ -968,7 +1001,7 @@ public class Main {
         }
 
         return returnMessage(req, res, SC_CREATED, "text-success",
-                "Gruppo con id "+ groupToEdit.getGroupId()+" aggiunto con successo.");
+                "Gruppo con id "+ groupToEdit.getGroupId()+" modificato con successo.");
     }
 
     private static String deleteGroup(Request req, Response res) {
@@ -1078,7 +1111,7 @@ public class Main {
             return handleParseError(req, res);
         }
 
-        int result = db.insertGenre(genreToEdit);
+        int result = db.updateGenre(genreToEdit);
         if(result < 0) {
             if(result == -2) {
                 return handleInternalError(req, res);
