@@ -1,7 +1,7 @@
 package com.gb.db;
 
-import com.gb.DAO.*;
-import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
+import com.gb.dao.*;
+import com.gb.db.postgreSQLImpl.PostgreSQLImpl;
 
 import java.sql.Connection;
 
@@ -11,9 +11,9 @@ import java.sql.Connection;
  * ad esempio uno che utilizza una sintassi SQL diversa,
  * basterà creare una nuova classe e cambiare il metodo
  * getDatabase di questa classe, in modo che restituisca
- * un' istanza della classe desiderata. Nel Main non dovrà
- * cambiare nulla, poiché questa classe (Database) fornisce
- * un livello di astrazione.
+ * un' istanza della classe desiderata. I metodi che interrogano
+ * il DB non dovranno cambiare, poiché questa classe (Database)
+ * fornisce un livello di astrazione.
  */
 public abstract class Database implements MusicDAO, AlbumDAO, ArtistDAO, GroupDAO, GenreDAO, LinkDAO {
 

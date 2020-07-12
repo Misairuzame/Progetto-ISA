@@ -1,0 +1,67 @@
+<div th:replace="header"/>
+
+<h1 class="display-3 text-success">Modifica Album</h1>
+<p class="text-warning">Attenzione:</p><p class="text-light">C'&egrave; un vincolo di chiave esterna
+    su GroupID. Per modificare un album &egrave; necessario che esista il gruppo che l'ha pubblicato.<br/></p>
+
+<!--
+ Anche se i form supportano il metodo POST, per poter fare il sumbit di alcuni
+ form anche con metodi PUT e DELETE si è creato un campo di input nascosto chiamato "method",
+ il quale contiene il metodo HTTP da utilizzare. "Main.java" legge questo parametro
+ (default = GET) ed effettua l'azione corrispondente (select/insert/update/delete)
+-->
+<div th:if="${albumToEdit == null}">
+    <form action="album" method="get">
+        <div class="form-group text-light">
+            <label for="albumid">AlbumID</label>
+            <input type="text" class="form-control" id="albumid" placeholder="AlbumID" name="albumid">
+        </div>
+        <div class="form-group text-light">
+            <label for="title">Title</label>
+            <input type="text" class="form-control" id="title" placeholder="Title" name="title">
+        </div>
+        <div class="form-group text-light">
+            <label for="year">Year</label>
+            <input type="text" class="form-control" id="year" placeholder="Year" name="year">
+        </div>
+        <div class="form-group text-light">
+            <label for="groupid">GroupID</label>
+            <input type="text" class="form-control" id="groupid" list="groupList" placeholder="GroupID" name="groupid">
+            <datalist id="groupList">
+                <option th:each="group: ${groupMap}" th:value="${group.getKey()}"
+                        th:text="${group.getValue()}"></option>
+            </datalist>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 0">Modifica</button>
+        <input type="hidden" name="method" value="PUT">
+    </form>
+</div>
+
+<div th:if="${albumToEdit != null}">
+    <form action="album" method="get">
+        <div class="form-group text-light">
+            <label for="albumidEd">AlbumID</label>
+            <input type="text" class="form-control" id="albumidEd" name="albumid" th:placeholder="${albumToEdit.getAlbumId()}" th:value="${albumToEdit.getAlbumId()}">
+        </div>
+        <div class="form-group text-light">
+            <label for="titleEd">Title</label>
+            <input type="text" class="form-control" id="titleEd" name="title" th:placeholder="${albumToEdit.getTitle()}" th:value="${albumToEdit.getTitle()}">
+        </div>
+        <div class="form-group text-light">
+            <label for="yearEd">Year</label>
+            <input type="text" class="form-control" id="yearEd" name="year" th:placeholder="${albumToEdit.getYear()}" th:value="${albumToEdit.getYear()}">
+        </div>
+        <div class="form-group text-light">
+            <label for="groupidEd">GroupID</label>
+            <input type="text" class="form-control" id="groupidEd" list="groupList2" name="groupid" th:placeholder="${albumToEdit.getGroupId()}" th:value="${albumToEdit.getGroupId()}">
+            <datalist id="groupList2">
+                <option th:each="group: ${groupMap}" th:value="${group.getKey()}"
+                        th:text="${group.getValue()}"></option>
+            </datalist>
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 0">Modifica</button>
+        <input type="hidden" name="method" value="PUT">
+    </form>
+</div>
+
+<div th:replace="footer"/>

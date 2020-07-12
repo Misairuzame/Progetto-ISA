@@ -1,4 +1,4 @@
-package com.gb.db.PostgreSQLImpl;
+package com.gb.db.postgreSQLImpl;
 
 import com.gb.modelObject.*;
 import org.postgresql.ds.PGSimpleDataSource;
@@ -9,7 +9,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.gb.Constants.*;
 
@@ -290,40 +292,40 @@ public class PostgreSQLImpl extends com.gb.db.Database {
     }
 
     /**
-     * La query SQL che viene eseguita è la seguente:<br/>
-     *<br/>
-     * SELECT *<br/>
-     * FROM<br/>
-     * (<br/>
-     * &emsp;SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, 'Vari artisti' AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename<br/>
-     * &emsp;FROM<br/>
-     * &emsp;music AS M LEFT JOIN album AS AL ON M.albumid = AL.albumid<br/>
-     * &emsp;JOIN grouptable AS GR ON M.authorid = GR.groupid<br/>
-     * &emsp;JOIN genre AS GE ON M.genreid = GE.genreid<br/>
-     * ) AS temp1<br/>
-     * WHERE (temp1.musictitle ~* ?<br/>
-     * OR temp1.groupname ~* ?<br/>
-     * OR temp1.albumtitle ~* ?<br/>
-     * OR temp1.genrename ~* ?)<br/>
-     * AND temp1.musicid NOT IN (<br/>
-     * &emsp;SELECT M.musicid<br/>
-     * &emsp;FROM<br/>
-     * &emsp;music AS M JOIN grouptable AS GR ON M.authorid = GR.groupid<br/>
-     * &emsp;JOIN artist AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?<br/>
-     * )<br/>
-     *<br/>
-     * UNION<br/>
-     *<br/>
-     * SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AR.name AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename<br/>
-     * FROM<br/>
-     * music AS M LEFT JOIN album AS AL ON M.albumid = AL.albumid<br/>
-     * JOIN grouptable AS GR ON M.authorid = GR.groupid<br/>
-     * JOIN genre AS GE ON M.genreid = GE.genreid<br/>
-     * JOIN artist AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?<br/>
-     *<br/>
-     * ORDER BY musicid<br/>
-     * LIMIT 10 OFFSET 0<br/>
-     *<br/>
+     * La query SQL che viene eseguita è la seguente:<br>
+     *<br>
+     * SELECT *<br>
+     * FROM<br>
+     * (<br>
+     * &emsp;SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, 'Vari artisti' AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename<br>
+     * &emsp;FROM<br>
+     * &emsp;music AS M LEFT JOIN album AS AL ON M.albumid = AL.albumid<br>
+     * &emsp;JOIN grouptable AS GR ON M.authorid = GR.groupid<br>
+     * &emsp;JOIN genre AS GE ON M.genreid = GE.genreid<br>
+     * ) AS temp1<br>
+     * WHERE (temp1.musictitle ~* ?<br>
+     * OR temp1.groupname ~* ?<br>
+     * OR temp1.albumtitle ~* ?<br>
+     * OR temp1.genrename ~* ?)<br>
+     * AND temp1.musicid NOT IN (<br>
+     * &emsp;SELECT M.musicid<br>
+     * &emsp;FROM<br>
+     * &emsp;music AS M JOIN grouptable AS GR ON M.authorid = GR.groupid<br>
+     * &emsp;JOIN artist AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?<br>
+     * )<br>
+     *<br>
+     * UNION<br>
+     *<br>
+     * SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AR.name AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename<br>
+     * FROM<br>
+     * music AS M LEFT JOIN album AS AL ON M.albumid = AL.albumid<br>
+     * JOIN grouptable AS GR ON M.authorid = GR.groupid<br>
+     * JOIN genre AS GE ON M.genreid = GE.genreid<br>
+     * JOIN artist AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?<br>
+     *<br>
+     * ORDER BY musicid<br>
+     * LIMIT 10 OFFSET 0<br>
+     *<br>
      * <b>Spiegazione</b>: Per permettere all'utente di cercare anche le canzoni di un certo artista, è necessario fare il join
      * fra la tabella music, la tabella grouptable e la tabella artist (c'è una gerarchia). Visto che una canzone può
      * avere più di un artista (una canzone ha un autore, che è un gruppo, il quale può essere composto da più artisti)
@@ -341,35 +343,35 @@ public class PostgreSQLImpl extends com.gb.db.Database {
 
         String sql =
                 " SELECT * " +
-                        " FROM " +
-                        " ( " +
-                        " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, 'Vari artisti' AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
-                        " FROM " +
-                         MUSIC_TABLE + " AS M LEFT JOIN " + ALBUM_TABLE + " AS AL ON M.albumid = AL.albumid " +
-                        " JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
-                        " JOIN " + GENRE_TABLE + " AS GE ON M.genreid = GE.genreid " +
-                        ") AS temp1 " +
-                        " WHERE (temp1.musictitle ~* ? " +
-                        " OR temp1.groupname ~* ? " +
-                        " OR temp1.albumtitle ~* ? " +
-                        " OR temp1.genrename ~* ?) " +
-                        " AND temp1.musicid NOT IN ( " +
-                        " SELECT M.musicid " +
-                        " FROM " +
-                         MUSIC_TABLE + " AS M JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
-                        " JOIN " + ARTIST_TABLE + " AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?" +
-                        " ) " +
+                " FROM " +
+                " ( " +
+                " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, 'Vari artisti' AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
+                " FROM " +
+                 MUSIC_TABLE + " AS M LEFT JOIN " + ALBUM_TABLE + " AS AL ON M.albumid = AL.albumid " +
+                " JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
+                " JOIN " + GENRE_TABLE + " AS GE ON M.genreid = GE.genreid " +
+                ") AS temp1 " +
+                " WHERE (temp1.musictitle ~* ? " +
+                " OR temp1.groupname ~* ? " +
+                " OR temp1.albumtitle ~* ? " +
+                " OR temp1.genrename ~* ?) " +
+                " AND temp1.musicid NOT IN ( " +
+                " SELECT M.musicid " +
+                " FROM " +
+                 MUSIC_TABLE + " AS M JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
+                " JOIN " + ARTIST_TABLE + " AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?" +
+                " ) " +
 
-                        " UNION " +
+                " UNION " +
 
-                        " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AR.name AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
-                        " FROM " +
-                         MUSIC_TABLE + " AS M LEFT JOIN " + ALBUM_TABLE + " AS AL ON M.albumid = AL.albumid " +
-                        " JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
-                        " JOIN " + GENRE_TABLE + " AS GE ON M.genreid = GE.genreid " +
-                        " JOIN " + ARTIST_TABLE + " AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?" +
-                        " ORDER BY musicid " +
-                        " LIMIT ? OFFSET ?";
+                " SELECT M.musicid, M.title AS musictitle, GR.name AS groupname, AR.name AS artistname, AL.title AS albumtitle, M.year, GE.name AS genrename " +
+                " FROM " +
+                 MUSIC_TABLE + " AS M LEFT JOIN " + ALBUM_TABLE + " AS AL ON M.albumid = AL.albumid " +
+                " JOIN " + GROUP_TABLE + " AS GR ON M.authorid = GR.groupid " +
+                " JOIN " + GENRE_TABLE + " AS GE ON M.genreid = GE.genreid " +
+                " JOIN " + ARTIST_TABLE + " AS AR ON AR.groupid = GR.groupid AND AR.name ~* ?" +
+                " ORDER BY musicid " +
+                " LIMIT ? OFFSET ?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, searchTerm);
@@ -455,7 +457,7 @@ public class PostgreSQLImpl extends com.gb.db.Database {
                     exists = rs.getInt(1) > 0;
                 }
                 if (!exists) {
-                    logger.warn("L'album con id {} non esiste, impossibile eliminarla.", albumId);
+                    logger.warn("L'album con id {} non esiste, impossibile eliminarlo.", albumId);
                     return -1;
                 }
             }
@@ -518,6 +520,51 @@ public class PostgreSQLImpl extends com.gb.db.Database {
             ps.executeUpdate();
         } catch (SQLException e) {
             logger.error("Exception in insertAlbum: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int updateAlbum(Album album) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + ALBUM_TABLE +
+                " WHERE " + ALBUMID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, album.getAlbumId());
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("L'album con id {} non esiste, impossibile aggiornarlo.", album.getAlbumId());
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in updateAlbum: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " UPDATE " + ALBUM_TABLE + " SET " +
+                 TITLE + " = ?," + YEAR + " = ?, " + GROUPID + " = ? " +
+                " WHERE " + ALBUMID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, album.getTitle());
+            ps.setInt(2, album.getYear());
+            ps.setInt(3, album.getGroupId());
+            ps.setInt(4, album.getAlbumId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Exception in updateAlbum: " + e.getMessage());
             return -2;
         }
 
@@ -662,6 +709,46 @@ public class PostgreSQLImpl extends com.gb.db.Database {
     }
 
     @Override
+    public int deleteArtist(int artistId) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + ARTIST_TABLE +
+                " WHERE " + ARTISTID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, artistId);
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("L'artista con id {} non esiste, impossibile eliminarlo.", artistId);
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in deleteArtist: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " DELETE FROM " + ARTIST_TABLE +
+                " WHERE " + ARTISTID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, artistId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error in deleteArtist: {}", e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
     public List<Genre> getAllGenres(int page) {
         List<Genre> genreList = new ArrayList<>();
 
@@ -752,6 +839,89 @@ public class PostgreSQLImpl extends com.gb.db.Database {
     }
 
     @Override
+    public int updateGenre(Genre genre) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GENRE_TABLE +
+                " WHERE " + GENREID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, genre.getGenreId());
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il genere con id {} non esiste, impossibile aggiornarlo.", genre.getGenreId());
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in updateGenre: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " UPDATE " + GENRE_TABLE + " SET " +
+                 NAME + " = ? " +
+                " WHERE " + GENREID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, genre.getName());
+            ps.setInt(2, genre.getGenreId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Exception in updateGenre: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int deleteGenre(int genreId) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GENRE_TABLE +
+                " WHERE " + GENREID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, genreId);
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il genere con id {} non esiste, impossibile eliminarlo.", genreId);
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in deleteGenre: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " DELETE FROM " + GENRE_TABLE +
+                " WHERE " + GENREID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, genreId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error in deleteGenre: {}", e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
     public List<Group> getAllGroups(int page) {
         List<Group> groupList = new ArrayList<>();
 
@@ -835,6 +1005,89 @@ public class PostgreSQLImpl extends com.gb.db.Database {
             ps.executeUpdate();
         } catch (SQLException e) {
             logger.error("Exception in insertGroup: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int updateGroup(Group group) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GROUP_TABLE +
+                " WHERE " + GROUPID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, group.getGroupId());
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il gruppo con id {} non esiste, impossibile aggiornarlo.", group.getGroupId());
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in updateGroup: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " UPDATE " + GROUP_TABLE + " SET " +
+                 NAME + " = ? " +
+                " WHERE " + GROUPID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, group.getName());
+            ps.setInt(2, group.getGroupId());
+
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Exception in updateGroup: " + e.getMessage());
+            return -2;
+        }
+
+        return 0;
+    }
+
+    @Override
+    public int deleteGroup(int groupId) {
+        String check =
+                " SELECT COUNT(*) " +
+                " FROM "  + GROUP_TABLE +
+                " WHERE " + GROUPID + " = ? ";
+
+        boolean exists = false;
+
+        try (PreparedStatement pStat = conn.prepareStatement(check)) {
+            pStat.setInt(1, groupId);
+            try (ResultSet rs = pStat.executeQuery()) {
+                if (rs.next()) {
+                    exists = rs.getInt(1) > 0;
+                }
+                if (!exists) {
+                    logger.warn("Il gruppo con id {} non esiste, impossibile eliminarlo.", groupId);
+                    return -1;
+                }
+            }
+        } catch (SQLException e) {
+            logger.error("Exception in deleteGroup: " + e.getMessage());
+            return -2;
+        }
+
+        String sql =
+                " DELETE FROM " + GROUP_TABLE +
+                " WHERE " + GROUPID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, groupId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            logger.error("Error in deleteGroup: {}", e.getMessage());
             return -2;
         }
 
@@ -1007,6 +1260,120 @@ public class PostgreSQLImpl extends com.gb.db.Database {
             return musicList;
         } catch (SQLException e) {
             logger.error("Error in getMusicByGroup: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Music> getMusicByArtist(int artistId, int page) {
+        List<Music> musicList = new ArrayList<>();
+
+        String sql =
+                " SELECT M.musicid, M.title, A.artistid AS authorid, M.albumid, M.year, M.genreid " +
+                " FROM " + MUSIC_TABLE + " AS M, " + GROUP_TABLE + " AS G, " +
+                 ARTIST_TABLE + " AS A " +
+                " WHERE M.authorid = G.groupid AND G.groupid = A.groupid AND " +
+                " A.artistid = ? " +
+                " LIMIT ? OFFSET ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, artistId);
+            ps.setInt(2, PAGE_SIZE);
+            ps.setInt(3, page*PAGE_SIZE);
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    musicList.add(new Music(rs));
+                }
+            }
+            return musicList;
+        } catch (SQLException e) {
+            logger.error("Error in getMusicByArtist: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Map<Integer, String> getGroupMap() {
+        Map<Integer, String> groupMap = new HashMap<>();
+
+        String sql =
+                " SELECT G."+GROUPID+", G."+NAME+" "+
+                " FROM " + GROUP_TABLE + " AS G ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    groupMap.put(rs.getInt(1), rs.getString(2));
+                }
+            }
+            return groupMap;
+        } catch (SQLException e) {
+            logger.error("Error in getGroupMap: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Map<Integer, String> getAlbumMap() {
+        Map<Integer, String> albumMap = new HashMap<>();
+
+        String sql =
+                " SELECT A."+ALBUMID+", A."+TITLE+" "+
+                " FROM " + ALBUM_TABLE + " AS A ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    albumMap.put(rs.getInt(1), rs.getString(2));
+                }
+            }
+            return albumMap;
+        } catch (SQLException e) {
+            logger.error("Error in getAlbumMap: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public Map<Integer, String> getGenreMap() {
+        Map<Integer, String> genreMap = new HashMap<>();
+
+        String sql =
+                " SELECT G."+GENREID+", G."+NAME+" "+
+                " FROM " + GENRE_TABLE + " AS G ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while(rs.next()) {
+                    genreMap.put(rs.getInt(1), rs.getString(2));
+                }
+            }
+            return genreMap;
+        } catch (SQLException e) {
+            logger.error("Error in getGenreMap: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Override
+    public List<Artist> getArtistById(int artistId) {
+        List<Artist> artistList = new ArrayList<>();
+
+        String sql =
+                " SELECT * " +
+                " FROM "  + ARTIST_TABLE +
+                " WHERE " + ARTISTID + " = ? ";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, artistId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if(rs.next()) {
+                    artistList.add(new Artist(rs));
+                }
+            }
+            return artistList;
+        } catch (SQLException e) {
+            logger.error("Error in getArtistById: {}", e.getMessage());
             return null;
         }
     }

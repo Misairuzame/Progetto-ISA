@@ -66,7 +66,7 @@ public class JoinAll {
     }
 
     public void setMusicId(int musicId) {
-        if(musicId < 0) {
+        if(musicId <= 0) {
             throw new IllegalArgumentException("MusicId deve essere > 0.");
         }
         this.musicId = musicId;
@@ -116,7 +116,7 @@ public class JoinAll {
 
     public void setNumLinks(int numLinks) {
         if(numLinks < 0) {
-            throw new IllegalArgumentException("Numero di link deve essere > 0.");
+            throw new IllegalArgumentException("Numero di link deve essere >= 0.");
         }
         this.numLinks = numLinks;
     }

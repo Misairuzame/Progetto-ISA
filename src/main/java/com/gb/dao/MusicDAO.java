@@ -1,4 +1,4 @@
-package com.gb.DAO;
+package com.gb.dao;
 
 import com.gb.modelObject.JoinAll;
 import com.gb.modelObject.Music;
@@ -30,5 +30,7 @@ public interface MusicDAO {
     List<Music> getMusicByGenre(int genreId, int page);
 
     List<Music> getMusicByGroup(int groupId, int page);
+
+    List<Music> getMusicByArtist(int artistId, int page);
 
 }

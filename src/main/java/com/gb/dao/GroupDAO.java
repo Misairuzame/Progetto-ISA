@@ -1,4 +1,4 @@
-package com.gb.DAO;
+package com.gb.dao;
 
 import com.gb.modelObject.Group;
 
@@ -12,6 +12,10 @@ public interface GroupDAO {
     List<Group> getGroupById(int groupId);
 
     int insertGroup(Group group);
+
+    int updateGroup(Group group);
+
+    int deleteGroup(int groupId);
 
     Map<Integer, String> getGroupMap();
 

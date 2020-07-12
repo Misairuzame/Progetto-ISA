@@ -26,10 +26,10 @@ public class Music {
             setMusicId(rs.getInt(MUSICID));
             setTitle(rs.getString(TITLE));
             setAuthorId(rs.getInt(AUTHORID));
-            if(rs.getString(ALBUMID) == null) {
-                setAlbumId(null);
-            } else {
+            if(rs.getString(ALBUMID) != null) {
                 setAlbumId(rs.getInt(ALBUMID));
+            } else {
+                setAlbumId(null);
             }
             setYear(rs.getInt(YEAR));
             setGenreId(rs.getInt(GENREID));
@@ -52,7 +52,7 @@ public class Music {
     }
 
     public void setMusicId(Integer musicId) {
-        if(musicId < 0) {
+        if(musicId <= 0) {
             throw new IllegalArgumentException("MusicId deve essere > 0.");
         }
         this.musicId = musicId;
@@ -74,7 +74,7 @@ public class Music {
     }
 
     public void setAuthorId(Integer authorId) {
-        if(authorId < 0) {
+        if(authorId <= 0) {
             throw new IllegalArgumentException("Music.authorId deve essere > 0.");
         }
         this.authorId = authorId;
@@ -107,7 +107,7 @@ public class Music {
     }
 
     public void setGenreId(Integer genreId) {
-        if(genreId < 0) {
+        if(genreId <= 0) {
             throw new IllegalArgumentException("Music.genreId deve essere > 0.");
         }
         this.genreId = genreId;

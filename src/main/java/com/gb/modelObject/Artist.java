@@ -40,7 +40,7 @@ public class Artist {
     }
 
     public void setArtistId(Integer artistId) {
-        if(artistId < 0) {
+        if(artistId <= 0) {
             throw new IllegalArgumentException("ArtistId deve essere > 0.");
         }
         this.artistId = artistId;
@@ -62,7 +62,7 @@ public class Artist {
     }
 
     public void setGroupId(Integer groupId) {
-        if(groupId < 0) {
+        if(groupId <= 0) {
             throw new IllegalArgumentException("Artist.groupId deve essere > 0.");
         }
         this.groupId = groupId;

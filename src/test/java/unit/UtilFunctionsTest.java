@@ -21,29 +21,29 @@ public class UtilFunctionsTest {
     }
 
     @Property
-    public void isNonNegativeIntegerWithNegativeNumbers(@InRange(maxInt = -1) int negativeNumber) {
+    public void isPositiveIntegerWithNegativeNumbers(@InRange(maxInt = 0) int negativeNumber) {
 
         String intString = String.valueOf(negativeNumber);
 
-        assertFalse(UtilFunctions.isNonNegativeInteger(intString));
+        assertFalse(UtilFunctions.isPositiveInteger(intString));
     }
 
     @Property
-    public void isNonNegativeIntegerWithPositiveNumbers(@InRange(minInt = 0) int positiveNumber) {
+    public void isPositiveIntegerWithPositiveNumbers(@InRange(minInt = 1) int positiveNumber) {
 
         String intString = String.valueOf(positiveNumber);
 
-        assertTrue(UtilFunctions.isNonNegativeInteger(intString));
+        assertTrue(UtilFunctions.isPositiveInteger(intString));
     }
 
     @Property(trials = 50)
-    public void isNonNegativeIntegerWithStrings(
+    public void isPositiveIntegerWithStrings(
             @From(StringGenerator.class) String testString,
             @From(AlphanumericGenerator.class) String alphanumString) {
 
-        assertFalse(UtilFunctions.isNonNegativeInteger(testString));
+        assertFalse(UtilFunctions.isPositiveInteger(testString));
 
-        assertFalse(UtilFunctions.isNonNegativeInteger(alphanumString));
+        assertFalse(UtilFunctions.isPositiveInteger(alphanumString));
     }
 
 }

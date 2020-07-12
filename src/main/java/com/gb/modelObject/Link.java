@@ -37,7 +37,7 @@ public class Link {
     }
 
     public void setMusicId(Integer musicId) {
-        if(musicId < 0) {
+        if(musicId <= 0) {
             throw new IllegalArgumentException("Link.musicId deve essere > 0.");
         }
         this.musicId = musicId;

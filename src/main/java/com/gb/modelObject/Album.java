@@ -43,7 +43,7 @@ public class Album {
     }
 
     public void setAlbumId(Integer albumId) {
-        if(albumId < 0) {
+        if(albumId <= 0) {
             throw new IllegalArgumentException("AlbumId deve essere > 0.");
         }
         this.albumId = albumId;
@@ -76,7 +76,7 @@ public class Album {
     }
 
     public void setGroupId(Integer groupId) {
-        if(groupId < 0) {
+        if(groupId <= 0) {
             throw new IllegalArgumentException("Album.groupid deve essere > 0.");
         }
         this.groupId = groupId;

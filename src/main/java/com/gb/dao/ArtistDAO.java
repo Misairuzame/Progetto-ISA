@@ -1,4 +1,4 @@
-package com.gb.DAO;
+package com.gb.dao;
 
 import com.gb.modelObject.Artist;
 import com.gb.modelObject.ArtistJoinGroup;
@@ -14,5 +14,9 @@ public interface ArtistDAO {
     int updateArtist(Artist artist);
 
     int insertArtist(Artist artist);
+
+    int deleteArtist(int artistId);
+
+    List<Artist> getArtistById(int artistId);
 
 }

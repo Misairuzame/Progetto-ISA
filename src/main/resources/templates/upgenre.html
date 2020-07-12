@@ -1,0 +1,41 @@
+<div th:replace="header"/>
+
+<h1 class="display-3 text-success">Modifica Genre</h1>
+
+<!--
+ Anche se i form supportano il metodo POST, per poter fare il sumbit di alcuni
+ form anche con metodi PUT e DELETE si è creato un campo di input nascosto chiamato "method",
+ il quale contiene il metodo HTTP da utilizzare. "Main.java" legge questo parametro
+ (default = GET) ed effettua l'azione corrispondente (select/insert/update/delete)
+-->
+<div th:if="${genreToEdit == null}">
+    <form action="genre" method="get">
+        <div class="form-group text-light">
+            <label for="genreid">GenreID</label>
+            <input type="text" class="form-control" id="genreid" placeholder="GenreId" name="genreid">
+        </div>
+        <div class="form-group text-light">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" placeholder="Name" name="name">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 0">Modifica</button>
+        <input type="hidden" name="method" value="PUT">
+    </form>
+</div>
+
+<div th:if="${genreToEdit != null}">
+    <form action="genre" method="get">
+        <div class="form-group text-light">
+            <label for="genreidEd">GenreID</label>
+            <input type="text" class="form-control" id="genreidEd" name="genreid" th:placeholder="${genreToEdit.getGenreId()}" th:value="${genreToEdit.getGenreId()}">
+        </div>
+        <div class="form-group text-light">
+            <label for="nameEd">Name</label>
+            <input type="text" class="form-control" id="nameEd" name="name" th:placeholder="${genreToEdit.getName()}" th:value="${genreToEdit.getName()}">
+        </div>
+        <button type="submit" class="btn btn-primary" style="margin: 0">Modifica</button>
+        <input type="hidden" name="method" value="PUT">
+    </form>
+</div>
+
+<div th:replace="footer"/>

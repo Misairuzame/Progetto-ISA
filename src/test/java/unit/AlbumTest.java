@@ -21,7 +21,7 @@ public class AlbumTest {
     }
 
     @Property(trials = 50)
-    public void setAlbumId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setAlbumId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Album().setAlbumId(negativeId);
@@ -86,7 +86,7 @@ public class AlbumTest {
     }
 
     @Property(trials = 50)
-    public void setGroupId(@InRange(maxInt = -1) int negativeId, @InRange(minInt = 0) int positiveId) {
+    public void setGroupId(@InRange(maxInt = 0) int negativeId, @InRange(minInt = 1) int positiveId) {
         IllegalArgumentException e1 = null;
         try {
             new Album().setGroupId(negativeId);
