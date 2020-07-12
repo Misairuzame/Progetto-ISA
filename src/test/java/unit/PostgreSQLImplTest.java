@@ -1,6 +1,6 @@
 package unit;
 
-import com.gb.db.PostgreSQLImpl.PostgreSQLImpl;
+import com.gb.db.postgreSQLImpl.PostgreSQLImpl;
 import com.gb.modelObject.Link;
 import com.gb.modelObject.Music;
 import com.gb.modelObject.MusicStrings;

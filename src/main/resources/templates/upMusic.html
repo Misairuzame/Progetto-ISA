@@ -86,7 +86,7 @@ L'AlbumID pu&ograve; essere null, ma se viene specificato deve esistere.</p>
                 <option th:each="genre: ${genreMap}" th:value="${genre.getKey()}" th:text="${genre.getValue()}"></option>
             </datalist>
         </div>
-        <button type="submit" class="btn btn-primary" style="margin: 0">Inserisci</button>
+        <button type="submit" class="btn btn-primary" style="margin: 0">Modifica</button>
         <input type="hidden" name="method" value="PUT">
     </form>
 </div>

@@ -33,7 +33,7 @@ public class SeleniumTest {
         assertNotNull(database);
     }
 
-    @Ignore
+    //@Ignore
     @Test
     public void browserFlow() throws SQLException {
         System.setProperty("webdriver.chrome.driver", Constants.USER_DIR+"\\src\\test\\resources\\driver\\chromedriver.exe");

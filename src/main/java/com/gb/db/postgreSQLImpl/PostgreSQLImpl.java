@@ -1,4 +1,4 @@
-package com.gb.db.PostgreSQLImpl;
+package com.gb.db.postgreSQLImpl;
 
 import com.gb.modelObject.*;
 import org.postgresql.ds.PGSimpleDataSource;

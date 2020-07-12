@@ -40,19 +40,19 @@
 <div th:if="${albumToEdit != null}">
     <form action="album" method="get">
         <div class="form-group text-light">
-            <label for="albumid">AlbumID</label>
+            <label for="albumidEd">AlbumID</label>
             <input type="text" class="form-control" id="albumidEd" name="albumid" th:placeholder="${albumToEdit.getAlbumId()}" th:value="${albumToEdit.getAlbumId()}">
         </div>
         <div class="form-group text-light">
-            <label for="title">Title</label>
+            <label for="titleEd">Title</label>
             <input type="text" class="form-control" id="titleEd" name="title" th:placeholder="${albumToEdit.getTitle()}" th:value="${albumToEdit.getTitle()}">
         </div>
         <div class="form-group text-light">
-            <label for="year">Year</label>
+            <label for="yearEd">Year</label>
             <input type="text" class="form-control" id="yearEd" name="year" th:placeholder="${albumToEdit.getYear()}" th:value="${albumToEdit.getYear()}">
         </div>
         <div class="form-group text-light">
-            <label for="groupid">GroupID</label>
+            <label for="groupidEd">GroupID</label>
             <input type="text" class="form-control" id="groupidEd" list="groupList2" name="groupid" th:placeholder="${albumToEdit.getGroupId()}" th:value="${albumToEdit.getGroupId()}">
             <datalist id="groupList2">
                 <option th:each="group: ${groupMap}" th:value="${group.getKey()}"

@@ -1,4 +1,4 @@
-package com.gb.DAO;
+package com.gb.dao;
 
 import com.gb.modelObject.Group;
 

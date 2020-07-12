@@ -22,7 +22,7 @@
 <div th:if="${albumToDel != null}">
     <form action="album" method="get">
         <div class="form-group text-light">
-            <label for="albumid">AlbumID</label>
+            <label for="albumidDel">AlbumID</label>
             <input type="text" class="form-control" id="albumidDel" name="albumid" th:placeholder="${albumToDel}" th:value="${albumToDel}">
         </div>
         <button type="submit" class="btn btn-danger" style="margin: 0">Elimina</button>

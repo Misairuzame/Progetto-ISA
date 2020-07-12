@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static com.gb.Constants.*;
-import static com.gb.Constants.GENREID;
 
 public class MusicJoinLink {
     private static final Logger logger = LoggerFactory.getLogger(MusicJoinLink.class);
