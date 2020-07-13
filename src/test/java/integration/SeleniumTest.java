@@ -11,6 +11,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -28,14 +29,21 @@ public class SeleniumTest {
     @BeforeClass
     public static void printName() {
         System.out.println("[Integration test] SeleniumTest");
-        database = Database.getDatabase();
+        try {
+            database = Database.getDatabase();
 
-        assertNotNull(database);
+            assertNotNull(database);
+            assertFalse(Database.getConnection().isClosed());
+        } catch (Exception e) {
+            System.out.println("-----------------------------------------------");
+            e.printStackTrace();
+            System.out.println("-----------------------------------------------");
+        }
     }
 
     //@Ignore
     @Test
-    public void browserFlow() throws SQLException {
+    public void browserFlow() {
         System.setProperty("webdriver.chrome.driver", Constants.USER_DIR+"\\src\\test\\resources\\driver\\chromedriver.exe");
 
         Main.main(new String[0]);
@@ -143,14 +151,52 @@ public class SeleniumTest {
                 }
             }
             assertTrue(found,
-                    "La canzone inserita non è stata trovata tramite la funzione di ricerca.");
+                    "La canzone appena inserita non è stata trovata tramite la funzione di ricerca.");
+
+            //Eliminazione della canzone
+            WebElement deleteButton = driver.findElement(By.id("del"+Integer.MAX_VALUE));
+            deleteButton.click();
+            WebElement reallyDelete = driver.findElement(By.ByClassName.className("btn-danger"));
+            reallyDelete.click();
+
+            //Nuova ricerca della canzone
+            WebElement searchForm2 = driver.findElement(By.id("searchFormText"));
+            searchForm2.sendKeys("temporaryTestMusic");
+            WebElement searchButton2 = driver.findElement(By.id("searchButton"));
+            searchButton2.click();
+            try {
+                //Se viene trovato qualcosa, si cerca nella tabella
+                WebElement tbody2 = driver.findElement(By.tagName("tbody"));
+                List<WebElement> td2 = tbody2.findElement(By.tagName("tr")).findElements(By.tagName("td"));
+                boolean found2 = false;
+                for (WebElement campo : td2) {
+                    if (campo.getText().equals("temporaryTestMusic")) {
+                        found2 = true;
+                    }
+                }
+                assertFalse(found2,
+                        "La canzone appena eliminata è stata trovata tramite la funzione di ricerca.");
+            } catch (NoSuchElementException ex) {
+                //Altrimenti si legge il messaggio mostrato all'utente
+                WebElement main = driver.findElement(By.tagName("main"));
+                WebElement message = main.findElement(By.tagName("h1"));
+                if (!message.getText().contains("non trovata")) {
+                    fail("La canzone appena eliminata è stata trovata tramite la funzione di ricerca.");
+                }
+            }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("-----------------------------------------------");
+            e.printStackTrace();
+            System.out.println("-----------------------------------------------");
             fail("Errore durante SeleniumTest");
         } finally {
             driver.quit();
-            Database.getConnection().rollback();
-            Database.getConnection().close();
+            try {
+                Database.getConnection().rollback();
+                Database.getConnection().setAutoCommit(true);
+            } catch (SQLException ey) {
+                System.out.println(ey.getMessage());
+            }
         }
     }
 

@@ -15,6 +15,18 @@ import java.util.Map;
 
 import static com.gb.Constants.*;
 
+/**
+ * Questa classe implementa le query definite nei DAO.
+ * Il database che essa interroga è PostgreSQL (v12.3). <br>
+ * Nota: Il tipo di ritorno List&lt;&gt; permette di verificare la
+ * corretta esecuzione delle query: una query che non restituisce
+ * alcun risultato fornirà una lista vuota, una query che ha
+ * fallito ed ha lanciato un'eccezione fornirà "null". Le query
+ * di update, insert e delete restituiscono invece un intero, con
+ * la seguente semantica: "0" = OK, "-1" = Operazione non fattibile
+ * (es. eliminazione di una canzone con ID non esistente, inserimento
+ * di una canzone con ID già presente), "-2" = Errore generico grave.
+ */
 public class PostgreSQLImpl extends com.gb.db.Database {
 
     private static Connection conn = null;
@@ -252,7 +264,7 @@ public class PostgreSQLImpl extends com.gb.db.Database {
     }
 
     @Override
-    public int deleteMusic(int id) {
+    public int deleteMusic(int musicId) {
         String check =
                 " SELECT COUNT(*) " +
                 " FROM "  + MUSIC_TABLE +
@@ -261,13 +273,13 @@ public class PostgreSQLImpl extends com.gb.db.Database {
         boolean exists = false;
 
         try (PreparedStatement pStat = conn.prepareStatement(check)) {
-            pStat.setInt(1, id);
+            pStat.setInt(1, musicId);
             try (ResultSet rs = pStat.executeQuery()) {
                 if (rs.next()) {
                     exists = rs.getInt(1) > 0;
                 }
                 if (!exists) {
-                    logger.warn("La canzone con id {} non esiste, impossibile eliminarla.", id);
+                    logger.warn("La canzone con id {} non esiste, impossibile eliminarla.", musicId);
                     return -1;
                 }
             }
@@ -281,7 +293,7 @@ public class PostgreSQLImpl extends com.gb.db.Database {
                 " WHERE " + MUSICID + " = ? ";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id);
+            ps.setInt(1, musicId);
             ps.executeUpdate();
         } catch (SQLException e) {
             logger.error("Error in deleteMusic: {}", e.getMessage());

@@ -94,6 +94,10 @@
         <input form="paginationForm" type="hidden" name="groupid" th:value="${groupId}">
     </div>
 
+    <div th:if="${artistId != null}">
+        <input form="paginationForm" type="hidden" name="artistid" th:value="${artistId}">
+    </div>
+
 </div>
 
 <div th:replace="footer"/>

@@ -6,6 +6,7 @@ import com.gb.modelObject.Genre;
 import com.gb.modelObject.Group;
 import com.gb.modelObject.Music;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.sql.SQLException;

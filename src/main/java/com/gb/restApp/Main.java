@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
-import spark.template.thymeleaf.ThymeleafTemplateEngine;
+import spark.TemplateEngine;
 import java.io.*;
 import java.net.URLDecoder;
 import java.util.*;
@@ -24,7 +24,7 @@ import static com.gb.restApp.DeserializationHelper.*;
 import static com.gb.restApp.MessageHandler.*;
 import static com.gb.restApp.DbReturnHelper.*;
 
-/**
+/*
  * Documentazione per le costanti rappresentanti gli stati HTTP, fornite da Apache HTTP:
  * http://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs/org/apache/http/HttpStatus.html
  *
@@ -32,6 +32,10 @@ import static com.gb.restApp.DbReturnHelper.*;
  * https://docs.oracle.com/javaee/7/api/javax/ws/rs/core/MediaType.html
  */
 
+/**
+ * La classe Main fa partire il Web server e si occupa
+ * principalmente di effettuare il routing delle richieste.
+ */
 public class Main {
 
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
@@ -40,7 +44,7 @@ public class Main {
         logger.info("Returned: {}", toLog);
     }
 
-    static final ThymeleafTemplateEngine engine = new ThymeleafTemplateEngine();
+    private static final TemplateEngine engine = MyTemplateEngine.getEngineInstance();
 
     public static void main(String[] args) {
 
@@ -87,7 +91,7 @@ public class Main {
 
     }
 
-    /**
+    /*
      * Sezione di utility varie
      */
 
@@ -143,7 +147,7 @@ public class Main {
     }
 
 
-    /**
+    /*
      * Sezione per effettuare il dispatching delle richieste.
      * Necessario per gestire i metodi HTTP.
      */
@@ -255,10 +259,21 @@ public class Main {
     }
 
 
-    /**
+    /*
      * Sezione per la visualizzazione dei form
      */
 
+    /**
+     * Questo metodo fa un ulteriore routing, oltre a quello già fatto
+     * dal framework. Permette di mostrare all'utente determinate pagine
+     * per cui non si è definita una route precisa nel Main, in modo da
+     * non rendere il Main troppo complicato. Inoltre questo metodo si
+     * occupa di preparare le view, inserendoci dati che rendono
+     * l'interfaccia Web più navigabile per l'utente.
+     * @param req L'oggetto Request
+     * @param res L'oggetto Response
+     * @return La stringa da mostrare all'utente
+     */
     private static String dispatchForms(Request req, Response res) {
         Map<String, Object> model = new HashMap<>();
         String viewName = req.params("form");
@@ -274,7 +289,7 @@ public class Main {
 
         /* Se un case non ha "break", vengono eseguite tutte le istruzioni fino a che
            non si trova un "break" (o finisce il blocco switch). Questo viene comodo
-           nell'effettuare degli "or" fra i vari casi. */
+           nell'effettuare degli "or" fra i vari casi. Viene detto "fall through". */
         switch (viewName) {
             case "upmusic":
                 putObjectInModel("musicToEdit", (id) -> db.getMusicById(id).get(0), req, model);
@@ -324,7 +339,7 @@ public class Main {
     }
 
 
-    /**
+    /*
      * Sezione per l'esecuzione di query
      */
 
@@ -764,8 +779,7 @@ public class Main {
 
         Genre genreToEdit = new Genre();
         try {
-            genreToEdit.setGenreId(Integer.parseInt(req.queryParams(GENREID)));
-            genreToEdit.setName(URLDecoder.decode(req.queryParams(NAME), "UTF-8"));
+            deserializeGenre(genreToEdit, req);
         } catch (UnsupportedEncodingException | IllegalArgumentException e) {
             logger.warn("Errore nella deserializzazione del genere da modificare");
             return handleParseError(res);
@@ -858,7 +872,32 @@ public class Main {
             return handleInternalError(res);
         }
 
-        return dbGetByIdQueryResult(db::getLinksForMusic, MUSICID, "linkList", "linksformusic", req, res);
+        int musicId;
+        try {
+            musicId = Integer.parseInt(req.queryParams(MUSICID));
+        } catch (IllegalArgumentException e) {
+            logger.warn("Errore nella deserializzazione dell'id della musica.");
+            return handleParseError(res);
+        }
+
+        Music music = db.getMusicById(musicId).get(0);
+
+        List<Link> linkList = db.getLinksForMusic(musicId);
+        if (linkList == null) {
+            return handleInternalError(res);
+        }
+        if (linkList.isEmpty()) {
+            return handleNotFound(res);
+        }
+
+        res.status(SC_OK);
+
+        info(linkList.toString());
+
+        Map<String, Object> model = new HashMap<>();
+        model.put("linkList", linkList);
+        model.put("music", music);
+        return engine.render(new ModelAndView(model, "linksformusic"));
     }
 
     /**

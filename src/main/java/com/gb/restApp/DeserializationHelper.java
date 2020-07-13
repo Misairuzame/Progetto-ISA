@@ -12,6 +12,13 @@ import java.util.function.Supplier;
 import static com.gb.Constants.*;
 import static com.gb.utils.UtilFunctions.isPositiveInteger;
 
+/**
+ * Questa classe contiene i metodi per la
+ * deserializzazione di oggetti a partire dai
+ * parametri nell'URL. I metodi put...InModel
+ * servono a facilitare la modifica e l'inserimento
+ * di elementi nel database da parte dell'utente.
+ */
 public class DeserializationHelper {
 
     public static void putIdInModel(String queryParam, Request req, Map<String,Object> model) {

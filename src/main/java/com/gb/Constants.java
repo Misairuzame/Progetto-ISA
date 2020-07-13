@@ -2,7 +2,7 @@ package com.gb;
 
 public class Constants {
 
-    /**
+    /*
      * Nomi relativi al database
      */
     public static final String DB_NAME = "MusicDB";
@@ -23,7 +23,7 @@ public class Constants {
     public static final String LINK_TABLE = "link";
     public static final String LINK = "link";
 
-    /**
+    /*
      * Altre costanti
      */
     public static final String USER_DIR     = System.getProperty("user.dir");
@@ -31,7 +31,7 @@ public class Constants {
     public static final String DB_PATH      = "jdbc:postgresql://localhost:5432/MusicDBPostgres?currentSchema=MusicDB";
     public static final int    PAGE_SIZE    = 10;
 
-    /**
+    /*
      * HTTP METHODS
      */
     public static final String GET = "GET";
