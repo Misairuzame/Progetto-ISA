@@ -104,22 +104,22 @@ Le classi che sono state meglio documentate sono quelle del package restApp.
 
 ## Schermate di esempio
 #### Visualizzazione della tabella Music
-![](images/1.png)
+![](images/1.PNG)
 
 #### Inserimento di un nuovo Album
-![](images/2.png)
+![](images/2.PNG)
 
 #### Modifica di un Artista
-![](images/3.png)
+![](images/3.PNG)
 
 #### Tabella di join contenente tutti i dettagli riguardo le tracce
-![](images/4.png)
+![](images/4.PNG)
 
 #### Ricerca a testo libero
-![](images/5.png)
+![](images/5.PNG)
 
 #### Visualizzazione delle tracce appartenenti a un Album
-![](images/6.png)
+![](images/6.PNG)
 
 #### Visualizzazione dei link per una traccia
-![](images/7.png)
+![](images/7.PNG)
