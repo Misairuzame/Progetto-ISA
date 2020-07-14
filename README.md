@@ -27,8 +27,8 @@ solo quelle che si sono ritenute necessarie):
 - GET su collezione -> Ottenere una lista di risorse
 - GET su risorsa -> Ottenere una rappresentazione della risorsa
 - PUT su risorsa -> Modificare la risorsa
-- POST su collezione -> Inserire di una nuova risorsa
-- DELETE su risorsa -> Eliminare della risorsa
+- POST su collezione -> Inserire una nuova risorsa
+- DELETE su risorsa -> Eliminare la risorsa
 
 ## Diagramma UML
 Il diagramma UML, generato automaticamente dall'IDE IntelliJ IDEA, è il seguente:
