@@ -101,3 +101,25 @@ e bottoni e scrivendo nelle caselle di testo. Ulteriori dettagli sui test potran
 Un primo esempio di Javadoc si può trovare nella cartella "docs" del progetto. La documentazione prodotta non è esaustiva
 e mira più a mostrare la tipologia di documentazione prodotta automaticamente da Gradle tramite il task "javadoc".
 Le classi che sono state meglio documentate sono quelle del package restApp.
+
+## Schermate di esempio
+#### Visualizzazione della tabella Music
+![](images/1.png)
+
+#### Inserimento di un nuovo Album
+![](images/2.png)
+
+#### Modifica di un Artista
+![](images/3.png)
+
+#### Tabella di join contenente tutti i dettagli riguardo le tracce
+![](images/4.png)
+
+#### Ricerca a testo libero
+![](images/5.png)
+
+#### Visualizzazione delle tracce appartenenti a un Album
+![](images/6.png)
+
+#### Visualizzazione dei link per una traccia
+![](images/7.png)
