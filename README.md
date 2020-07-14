@@ -1,5 +1,10 @@
 # Progetto per l'esame di Ingegneria del Software Avanzata
-![](images/logo.png) 
+![](images/logo.png)
+
+# Specifica dei requisiti
+La specifica (parziale) dei requisiti è visualizzabile al seguente link:
+https://docs.google.com/document/d/1BrmytTsQzHSki1nt6LxteQLjmjON61ampfPhvYwBY1Y/edit?usp=sharing \
+<b>Nota:</b> Il link è visibile solamente a chi fa parte dell'Università degli Studi di Ferrara.
 
 ## Introduzione
 Il progetto è una semplice applicazione Web che permette agli utenti di gestire un database di musica. Questo
