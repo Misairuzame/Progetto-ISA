@@ -44,7 +44,7 @@ public class SeleniumTest {
     //@Ignore
     @Test
     public void browserFlow() {
-        System.setProperty("webdriver.chrome.driver", Constants.USER_DIR+"\\src\\test\\resources\\driver\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", Constants.USER_DIR+"\\src\\test\\resources\\driver\\chromedriver_84.exe");
 
         Main.main(new String[0]);
 
