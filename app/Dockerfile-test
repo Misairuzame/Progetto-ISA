@@ -1,0 +1,18 @@
+# Fase 1: Build del progetto con Gradle
+FROM gradle:8-jdk21-alpine AS builder
+
+WORKDIR /app
+
+RUN apk add --no-cache chromium-chromedriver
+
+COPY . .
+
+#RUN sed -i 's/org.mockito:mockito-all:1.10.19/org.mockito:mockito-all:5.7.0/' build.gradle
+
+RUN cp /usr/bin/chromedriver ./src/test/resources/driver/chromedriver
+
+#RUN gradle fatJar --no-daemon
+
+#CMD [ "gradle", "integrationTest", "--no-daemon" ]
+
+CMD ["tail", "-f", "/dev/null"]
